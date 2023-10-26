@@ -1,13 +1,12 @@
 # HRLibrary V1
-- How can you develop scripts without knowing script functions?
+- A library script that is needed for all our resources as well as a script to make it easier for others to write by providing functions that will optimize your scripts.
 
 ## Installation
-1. Download the dependency
-    - Download [HRNotify](https://github.com/HRScripts/HRNotify) and move it to your resources folder
+    - Download the dependency [HRNotify](https://github.com/HRScripts/HRNotify) and move it to your resources folder
+    - Configure the dependency [HRNotify](https://github.com/HRScripts/HRNotify)
     - Write `start HRNotify` in your `server.cfg` file
-2. Download the script
-    - Download the script and then move it from the archite to your resources folder
-    - Write `start HRLib` in your `server.cfg` file under the row `start HRNotify` (it is very important to be under the row that starts HRNotify!!!!)
+    - Download HRLib and move it to your resources folder
+    - Write `start HRLib` in your `server.cfg` file below the row `start HRNotify` (it is very important to be below the row that starts HRNotify)
     - Configurate it
  
 ## Take a look of the configuration file (config.lua)
