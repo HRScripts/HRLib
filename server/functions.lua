@@ -137,7 +137,7 @@ HRLib.RegCommand = function(name, accessFromConsole, accessFromInGame, cb, enabl
     end
 
     if clib.RegisteredCmds[name] then
-        table.remove(clib.RegisteredCmds, tonumber(name))
+        table.remove(clib.RegisteredCmds, name)
         TriggerClientEvent('chat:removeSuggestion', '/'..name)
         clib.RegisteredCmds[name] = {cb = cb, accessFromConsole = accessFromConsole, accessFromInGame = accessFromInGame, suggestions = suggestions}
     else
@@ -146,7 +146,7 @@ HRLib.RegCommand = function(name, accessFromConsole, accessFromInGame, cb, enabl
     end
 
     if accessFromConsole == false and accessFromInGame == false then
-        table.remove(clib.RegisteredCmds, tonumber(name))
+        table.remove(clib.RegisteredCmds, name)
         local args, rawCommand, IPlayer, FPlayer = {[1] = nil, [2] = nil, [3] = nil}, nil, nil, nil
         cb(args, rawCommand, IPlayer, FPlayer)
         TriggerClientEvent('chat:removeSuggestion', '/'..name)
