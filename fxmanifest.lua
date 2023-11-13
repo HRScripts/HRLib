@@ -9,19 +9,16 @@ lua54 'yes'
 
 
 shared_scripts {
-    'translator.lua',
-}
-
-server_scripts {
-    'server/global.lua',
-    'server/functions.lua',
-    'server/main.lua',
-    'server/commands.lua',
+    'config.lua',
+    'translator.lua'
 }
 
 client_scripts {
     'client/global.lua',
-    'client/functions.lua',
-    'client/main.lua',
-    'client/commands.lua',
+    'client/*.lua'
+}
+
+server_scripts {
+    'server/global.lua',
+    'server/*.lua'
 }
