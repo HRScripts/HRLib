@@ -168,7 +168,7 @@ HRLib.RegCommand = function(name, cb, enableAce, suggestions)
             IPlayer,
             FPlayer
         )
-    end, enableAce or false)GetPlayerPed(GetPlayerFromServerId(FPlayer.id))
+    end, enableAce or false)
 end
 
 ---@param coords vector3
