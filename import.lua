@@ -136,7 +136,7 @@ if serverSide then
     hrlib.OnStart(nil, function()
         for k,v in pairs(clib.RegisteredCmds) do
             if type(v.suggestions) == 'table' and table.type(v.suggestions) ~= 'empty' then
-                TriggerClientEvent('chat:addSuggestion', source, ('/%s'):format(k), v.suggestions.help or '', v.suggestions.args or {})
+                TriggerClientEvent('chat:addSuggestion', -1, ('/%s'):format(k), v.suggestions.help or '', v.suggestions.args or {})
             end
         end
     end)
