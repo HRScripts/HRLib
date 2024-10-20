@@ -66,22 +66,6 @@ hrlib.Teleport = function(playerId, coords)
     SetEntityCoordsNoOffset(GetPlayerPed(GetPlayerFromServerId(playerId)), coords) ---@diagnostic disable-line: missing-parameter, param-type-mismatch
 end
 
----@param Id integer? player server Id or ped or nil for the current player ped
----@param health integer health value
----@changelog version 1.0.0, version 2.0.0
----@version 2.0.0
-hrlib.Health = function(Id, health)
-    if DoesEntityExist(Id) then ---@diagnostic disable-line: param-type-mismatch
-        SetEntityHealth(Id --[[@as integer]], health or (IsPedMale(Id --[[@as integer]]) and 200 or 100))
-    elseif clib.DoesIdExist(Id) then
-        local ped <const> = GetPlayerPed(GetPlayerFromServerId(Id --[[@as integer]]))
-        SetEntityHealth(ped, health or (IsPedMale(ped) and 200 or 100))
-    else
-        local ped <const> = PlayerPedId()
-        SetEntityHealth(ped, health or (IsPedMale(ped) and 200 or 100))
-    end
-end
-
 ---@type fun(description: string, type: 'success'|'info'|'error'|'warning', duration: number, pos: 'top-right'|'center-right'|'bottom-right'|'frombelow-right'|'top-left'|'left-center'|'frombelow-left'?, sound: boolean?)
 hrlib.Notify = clib.Notify
 
@@ -198,7 +182,7 @@ hrlib.AllWeapons = clib.allWeapons
 ---@version 1.0.0
 hrlib.AllPickups = clib.allPickups
 
-local modules <const> = { 'closest', 'import', 'streaming', 'string', 'table', 'ui' }
+local modules <const> = { 'closest', 'import', 'interface', 'streaming', 'string', 'table' }
 for i=1, #modules do
     local module <const> = load(LoadResourceFile('HRLib', ('client/modules/%s.lua'):format(modules[i])), ('@@HRLib/client/modules/%s.lua'):format(modules[i]))()
     if module then

@@ -13,24 +13,52 @@ local framework <const> = (GetResourceState('ox_core'):find('start') or GetResou
 
 if not framework then return false end
 
-local bridge <const> = {}
+local bridge <const>, clib <const> = {}, load(LoadResourceFile('HRLib', 'server/modules/local.lua'), '@@HRLib/server/modules/local.lua')()
 bridge.framework = framework
-bridge.type = bridge.framework.AddAcocountBalance and 'ox' or bridge.framework.GetPlayerFromId and 'esx' or bridge.framework.GetPlayerByPhone and 'qb'
+bridge.type = GetResourceState('ox_core'):find('start') and 'ox' or GetResourceState('es_extended'):find('start') and 'esx' or GetResourceState('qb-core'):find('start') and 'qb'
+
+---@param playerId integer
+---@param nameType 'firstname'|'lastname'? Default: 'Firstname Lastname' (both two names in one string)
+---@return string?
+bridge.getName = function(playerId, nameType)
+    if clib.DoesIdExist(playerId) then
+        if bridge.type == 'ox' then
+            return bridge.framework.CallPlayer(playerId, 'get', type(nameType) == 'nil' and 'name' or nameType == 'firstname' and 'firstName' or nameType == 'lastname' and 'lastName')
+        elseif bridge.type == 'esx' then
+            if nameType == nil then
+                return bridge.framework.GetPlayerFromId(playerId).getName()
+            else
+                return select(nameType == 'firstname' and 1 or 2, clib.splitString(bridge.framework.GetPlayerFromId(playerId).getName(), ' '))
+            end
+        elseif bridge.type == 'qb' then
+            local player <const> = bridge.framework.GetPlayer(playerId)
+            return nameType == nil and ('%s %s'):format(player.PlayerData.charinfo.firstname, player.PlayerData.charinfo.lastname) or nameType == 'firstname' and player.PlayerData.charinfo.firstname or player.PlayerData.charinfo.lastname
+        end
+    end
+end
 
 ---@param playerId integer
 ---@param returnGrade boolean?
 ---@return string? jobName, integer? jobGrade
 bridge.getJob = function(playerId, returnGrade)
-    if type(playerId) == 'integer' then
+    if clib.DoesIdExist(playerId) then
         if bridge.type == 'ox' then
             local playerGroups <const> = framework.CallPlayer(playerId, 'getGroups')
             return type(playerGroups) == 'function' and playerGroups() or nil
         elseif bridge.type == 'esx' then
             local playerJob <const> = framework.GetPlayerFromId(playerId)?.getJob()
-            return playerJob.name, returnGrade and playerJob.grade or nil
+            if returnGrade then
+                return playerJob.name, playerJob.grade
+            else
+                return playerJob.name
+            end
         elseif bridge.type == 'qb' then
-            local playerJob <const> = framework.Functions.GetPlayer(playerId)?.PlayerData.job
-            return playerJob?.name, returnGrade and playerJob?.grade or nil
+            local playerJob <const> = framework.Functions.GetPlayer(playerId)?.PlayerData?.job
+            if returnGrade then
+                return playerJob.name, playerJob.grade
+            else
+                return playerJob.name
+            end
         end
     end
 end
@@ -39,7 +67,7 @@ end
 ---@param account 'cash'|'bank'
 ---@return integer?
 bridge.getMoney = function(playerId, account)
-    if type(playerId) == 'integer' then
+    if clib.DoesIdExist(playerId) then
         if bridge.type == 'ox' then
             if account == 'bank' then
                 return framework.CallPlayer(playerId, 'getAccount')?.balance
@@ -56,7 +84,7 @@ end
 ---@param jobName string
 ---@param jobGrade integer
 bridge.setJob = function(playerId, jobName, jobGrade)
-    if type(playerId) == 'integer' then
+    if clib.DoesIdExist(playerId) then
         if bridge.type == 'ox' then
             local setJob <const> = framework.CallPlayer(playerId, 'setGroup')
             if setJob then
@@ -80,7 +108,7 @@ end
 ---@param account 'cash'|'bank'
 ---@param amount integer
 bridge.setMoney = function(playerId, account, amount)
-    if type(playerId) == 'integer' then
+    if clib.DoesIdExist(playerId) then
         if bridge.type == 'ox' then
             if account == 'cash' then
                 local moneyBalance <const> = exports.ox_inventory:GetItemCount(playerId, 'money')

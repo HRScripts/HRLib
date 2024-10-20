@@ -27,7 +27,7 @@ end
 
 ---trigger a fucused client event to the current player
 ---@param eventName string
----@param ... any
+---@param ... any?
 function fplayer:FocusedEvent(eventName, ...)
     TriggerClientEvent(eventName, self.id, ...)
 end

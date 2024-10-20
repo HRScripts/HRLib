@@ -6,12 +6,6 @@ local hrlib <const>, clib <const>, _ <const> = load(LoadResourceFile(resName, 's
 AddEventHandler('onResourceStart', function(resource)
     if resource == resName and resource ~= 'HRLib' then
         warn(('^HRLib^3 is with different name (^1%s^3)! Please change this name because this will stop the working of all our resources!'):format(resName))
-
-        for k,v in pairs(clib.RegisteredCmds) do
-            if type(v.suggestions) == 'table' and table.type(v.suggestions) ~= 'empty' then
-                TriggerEvent('chat:addSuggestion', ('/%s'):format(k), v.suggestions.help or '', v.suggestions.args or {})
-            end
-        end
     end
 end)
 

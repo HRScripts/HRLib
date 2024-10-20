@@ -20,6 +20,7 @@ server_script 'server/main.lua'
 files {
     'config.lua',
     'client/**/*.*',
+    'client/web/features/**/*.*',
     'import.lua',
     'translator.lua'
 }

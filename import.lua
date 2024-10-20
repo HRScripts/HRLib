@@ -48,6 +48,8 @@ hrlib.Callback = function(name, ...)
 end
 
 if serverSide then
+    local NUICallbacks <const> = {}
+
     ---@param name string the callback name
     ---@param playerId integer? An existing player server Id or nil (if nil, the player server Id will be set to -1 or if the player server Id does not exist, it will be set to -1)
     ---@param ... any?
@@ -125,6 +127,14 @@ if serverSide then
         end
     end)
 
+    RegisterNetEvent(('__%s:getNUIValue'):format(resName), function(key, value)
+        if not NUICallbacks[source] then
+            NUICallbacks[source] = { [key] = value }
+        else
+            NUICallbacks[source][key] = value
+        end
+    end)
+
     hrlib.CreateCallback(('__%s:HRLibDoesIdExist'):format(resName), true, function(_, playerId) ---@diagnostic disable-line: deprecated
         return clib.DoesIdExist(playerId) or false
     end)
@@ -140,7 +150,17 @@ if serverSide then
             end
         end
     end)
+
+    hrlib.GetNUICallback = function(playerId, key)
+        return NUICallbacks[playerId]?[key]
+    end
 else
+    local NUICallbacks <const> = setmetatable({}, {
+        __newindex = function(self, k, v)
+            TriggerServerEvent(('__%s:getNUIValue'):format(resName), k, v)
+        end
+    })
+
     ---@param name string the callback name
     ---@param ... any
     ---@changelog version 1.0.0
@@ -208,6 +228,7 @@ else
 
         for k,v in pairs(clib.RegisteredCmds) do
             if type(v.suggestions) == 'table' and table.type(v.suggestions) ~= 'empty' then
+                print(v.suggestions.help, v.suggestions.args?[1])
                 TriggerEvent('chat:addSuggestion', ('/%s'):format(k), v.suggestions.help or '', v.suggestions.args or {})
             end
         end
@@ -217,6 +238,19 @@ else
         for k,v in pairs(clib.RegisteredCmds) do
             if type(v.suggestions) == 'table' and table.type(v.suggestions) ~= 'empty' then
                 TriggerEvent('chat:addSuggestion', ('/%s'):format(k), v.suggestions.help or '', v.suggestions.args or {})
+            end
+        end
+    end)
+
+    ---@param key string
+    hrlib.getNUIValue = function(key)
+        return NUICallbacks[key]
+    end
+
+    RegisterNUICallback('lib:loadCallback', function(data)
+        if type(data) == 'table' then
+            for k,v in pairs(data) do
+                NUICallbacks[k] = v
             end
         end
     end)

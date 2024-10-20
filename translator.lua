@@ -20,7 +20,7 @@ end
 
 if not locales[language] then
     local oldLanguage <const> = language
-    local warnMessage <const> = ('The language %s does not exist in resource %s! The current language translation is %s'):format(oldLanguage, GetCurrentResourceName(), language)
+    local warnMessage <const> = ('The language %s does not exist in resource %s! The current language translation is %s'):format(oldLanguage, GetCurrentResourceName(), '%s')
 
     if locales['en'] then
         language = 'en'
@@ -40,7 +40,7 @@ if not locales[language] then
 
     if language == 'notFound' then return end
 
-    warn(warnMessage)
+    warn(warnMessage:format(language))
 end
 
 ::continue::

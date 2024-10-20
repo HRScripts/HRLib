@@ -15,7 +15,6 @@
 ---@field ClosestObject fun(Id: integer?, returnCloseObjects: boolean?): { entity: integer, distance: number }?, { entity: integer, distance: number }[]?
 ---@field ClosestIPlayer fun(Id: integer?, returnCloseIPlayers: boolean?): HRLibCloseIPlayer?, HRLibCloseIPlayer[]?
 ---@field ClosestFPlayer fun(Id: integer?, returnCloseFPlayers: boolean?): HRLibCloseFPlayer?, HRLibCloseFPlayer[]?
----@field Health fun(Id: integer?, health: number?)
 ---@field Notify fun(description: string?, type: 'success'|'info'|'error'|'warning'?, duration: number?, pos: 'top-right'|'center-right'|'bottom-right'|'frombelow-right'|'top-left'|'left-center'|'frombelow-left'?, sound: boolean?)
 ---@field RegCommand fun(name: string, cb: fun(args: string[]|any[]?, rawCommand: any, IPlayer: HRLibClientIPlayer, FPlayer: HRLibClientFPlayer), suggestions: { help: string?, args: table[]? }?)
 ---@field string { split: fun(text: string, key: string, returnAllAs: 'string'|'number'?, isArray: boolean?): ...|string[]|number[]?, gather: fun(source: string, key: string): string? }
@@ -25,7 +24,7 @@
 ---@field ServerCallback fun(name: string, ...: ...?): any
 ---@field require fun(path: string): any Available in import method only!
 ---@field GetPlayers fun(): integer[]
----@field Keys table<string, string>
+---@field Keys table<string, integer>
 ---@field AllWeapons string[]
 ---@field AllPickups string[]
 ---@field OnStart fun(resName: string|'any'?, cb: fun(resource: string)) Available in import method only!
@@ -36,7 +35,7 @@
 ---@field OnPlJoining fun(cb: fun()) Available in import method only!
 ---@field OnPlSpawn fun(cb: fun()) Available in import method only!
 ---@field OnPlDisc fun(cb: fun()) Available in import method only!
----@field getNUIValue fun(key: string): any
+---@field getNUIValue fun(key: string): any Available in import method only!
 
 ---@class HRLibServerFunctions
 ---@field DiscordMsg fun(webHook: string, botName: string, title: string, message: string, type: string?, color: integer, icon: string, author: string)
@@ -75,7 +74,6 @@
 ---@field Teleport fun(self: HRLibClientFPlayer, coords: vector3)
 ---@field SpawnVehicle fun(self: HRLibClientFPlayer, vehModel: string|integer, spawnPedInside: boolean?, saveVehicle: boolean?): integer?
 ---@field Freeze fun(self: HRLibClientFPlayer, toggle: boolean)
----@field Notify fun(self: HRLibClientFPlayer, description: string?, type: 'success'|'info'|'error'|'warning'?, duration: number?, pos: 'top-right'|'center-right'|'bottom-right'|'frombelow-right'|'top-left'|'left-center'|'frombelow-left'?, sound: boolean?)
 
 ---@class HRLibServerFPlayer
 ---@field Teleport fun(self: HRLibServerFPlayer, coords: vector3)

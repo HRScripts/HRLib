@@ -85,7 +85,7 @@ function fplayer:Health(health)
     SetEntityHealth(ped, health or (IsPedMale(ped) and 200 or 100))
 end
 
----@param toggle boolean toggle player invincible
+---@param toggle boolean? toggle player invincible
 ---@changelog version 1.0.0
 ---@version 1.0.0
 function fplayer:Invincible(toggle)

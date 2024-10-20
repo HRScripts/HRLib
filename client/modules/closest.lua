@@ -75,7 +75,7 @@ closestFuncs.ClosestObject = function(Id, returnCloseObjects)
         objects[i] = { entity = objects[i], distance = #(playerCoords - GetEntityCoords(objects[i])) }
 
         local curr <const> = objects[i]
-        if table.type(closestObject) == 'empty' then
+        if type(closestObject) == 'nil' or table.type(closestObject) == 'empty' then
             closestObject = curr
         else
             if closestObject.distance > curr.distance then
