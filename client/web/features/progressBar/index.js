@@ -48,7 +48,7 @@ async function animateHVProgress(type, duration) {
         } else {
             clearInterval(type == 'vertical' ? verticalInterval : horizontalInterval);
 
-            $(progressName).height('0vh')
+            $(progressName)[type == 'vertical' ? 'height' : 'width']('0vh')
             progressBar.style.display = 'none';
         };
     }, duration / 100);
@@ -141,7 +141,7 @@ const setProgressBarPosition = (progressType, position) => {
             posCss = { bottom: `${offset}px`, left: `${offset}px` };
             break;
         case 'bottom-center':
-            posCss = { botton: `${offset}px`, left: `${centerWidth}px` };
+            posCss = { bottom: `${offset}px`, left: `${centerWidth}px` };
             break;
         case 'bottom-right':
             posCss = { bottom: `${offset}px`, right: `${offset}px` };
