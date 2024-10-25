@@ -18,7 +18,7 @@ jobs:
 
       - name: Set up Git
         run: |
-          git config --local user.email "hr"
+          git config --local user.email "hr.fivem.dev@gmail.com"
           git config --local user.name "GitHub Actions"
 
       - name: Fetch Latest Release
@@ -28,18 +28,13 @@ jobs:
           echo "::set-output name=tag::$(echo $latest_release | jq -r .tag_name)"
           echo "::set-output name=rar_url::$(echo $latest_release | jq -r '.assets[] | select(.name | endswith(".rar")) | .url')"
 
-      - name: Download Latest Release
+      - name: Push Release
         run: |
-          curl -L -o release.rar ${{ steps.fetch_release.outputs.rar_url }}
+          repo_name="${"${{ github.repository }}"#*/}"
+          wget https://github.com/HRScripts/$repo_name/releases/latest/download/$repo_name.rar
           sudo apt-get install unrar
-          unrar x release.rar  # Extract the .rar file
-
-      - name: Copy Release Changes to Main
-        run: |
-          cp -r * .  # Adjust this as necessary to specify the correct path
+          unrar x $repo_name.rar
+          cd $repo_name
           git add .
-          git commit -m "Update main with changes from release ${{ steps.fetch_release.outputs.tag }}"
-
-      - name: Push Changes to Main
-        run: |
+          git commit -m "$repo_name ${{steps.fetch_release.outputs.tag}}"
           git push origin main
