@@ -1,4 +1,4 @@
-name: Merge Release to Main
+name: Push Latest Releases
 
 on:
   release:
