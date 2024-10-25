@@ -1,0 +1,37 @@
+name: Push Release to Main
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  push-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Git
+        run: |
+          git config --local user.email "hr.fivem.dev@gmail.com"
+          git config --local user.name "GitHub Actions"
+
+      - name: Create Release Branch
+        run: |
+          git checkout -b release-${{ github.event.release.tag_name }}
+          git commit --allow-empty -m "push ${{ github.event.release.tag_name }}"
+          git push origin push-${{ github.event.release.tag_name }}
+
+      - name: Merge Release into Main
+        run: |
+          git checkout main
+          git merge --no-ff push-${{ github.event.release.tag_name }}
+          git push origin main
+
+      - name: Clean Up
+        run: |
+          git branch -d push-${{ github.event.release.tag_name }}
