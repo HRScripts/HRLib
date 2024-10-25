@@ -3,6 +3,7 @@ name: Push Release to Main
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 permissions:
   contents: write
