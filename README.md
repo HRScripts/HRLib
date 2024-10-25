@@ -1,4 +1,4 @@
-# HRLibrary v2.5.1
+# HRLibrary v2.5.2
 A FiveM library based on LuaGLM 5.4, used in all HRScripts Development scripts
 
 ## ⬇️ Download
