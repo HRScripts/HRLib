@@ -1,15 +1,15 @@
 local GetResourceState = GetResourceState
-local framework <const> = (GetResourceState('ox_core'):find('start') or GetResourceState('es_extended'):find('start') or GetResourceState('qb-core'):find('start')) and setmetatable({}, {
+local framework <const> = (GetResourceState('ox_core'):find('start') and setmetatable({}, {
     __index = function(self, k)
         if not rawget(self, k) then
             self[k] = function(...)
-                return GetResourceState('ox_core'):find('start') and exports.ox_core[k](...) or GetResourceState('es_extended'):find('start') and exports.es_extended:getSharedObject()[k](...) or GetResourceState('qb-core'):find('start') and exports['qb-core']:GetCoreObject()[k](...)
+                return exports.ox_core[k](...)
             end
         end
 
         return self[k]
     end
-})
+}) or GetResourceState('es_extended'):find('start') and exports.es_extended:getSharedObject() or GetResourceState('qb-core'):find('start')) and exports['qb-core']:GetCoreObject()
 
 if not framework then return false end
 
@@ -23,15 +23,15 @@ bridge.type = GetResourceState('ox_core'):find('start') and 'ox' or GetResourceS
 bridge.getName = function(playerId, nameType)
     if clib.DoesIdExist(playerId) then
         if bridge.type == 'ox' then
-            return bridge.framework.CallPlayer(playerId, 'get', type(nameType) == 'nil' and 'name' or nameType == 'firstname' and 'firstName' or nameType == 'lastname' and 'lastName')
+            return framework.CallPlayer(playerId, 'get', type(nameType) == 'nil' and 'name' or nameType == 'firstname' and 'firstName' or nameType == 'lastname' and 'lastName')
         elseif bridge.type == 'esx' then
             if nameType == nil then
-                return bridge.framework.GetPlayerFromId(playerId).getName()
+                return framework.GetPlayerFromId(playerId).getName()
             else
-                return select(nameType == 'firstname' and 1 or 2, clib.splitString(bridge.framework.GetPlayerFromId(playerId).getName(), ' '))
+                return select(nameType == 'firstname' and 1 or 2, clib.splitString(framework.GetPlayerFromId(playerId).getName(), ' '))
             end
         elseif bridge.type == 'qb' then
-            local player <const> = bridge.framework.GetPlayer(playerId)
+            local player <const> = framework.GetPlayer(playerId)
             return nameType == nil and ('%s %s'):format(player.PlayerData.charinfo.firstname, player.PlayerData.charinfo.lastname) or nameType == 'firstname' and player.PlayerData.charinfo.firstname or player.PlayerData.charinfo.lastname
         end
     end
