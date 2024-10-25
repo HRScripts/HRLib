@@ -30,7 +30,8 @@ jobs:
 
       - name: Push Release
         run: |
-          repo_name="${${{ github.repository }}#*/}"
+          repo_name="${{ github.repository }}"
+          repo_name=$repo_name#*/
           echo "$repo_name"
           wget "https://github.com/HRScripts/$repo_name/releases/latest/download/$repo_name.rar"
           sudo apt-get install unrar
