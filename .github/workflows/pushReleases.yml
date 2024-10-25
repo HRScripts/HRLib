@@ -1,4 +1,4 @@
-name: Push Release to Main
+name: Merge Release to Main
 
 on:
   release:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  push-release:
+  merge-release:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,21 +18,16 @@ jobs:
 
       - name: Set up Git
         run: |
-          git config --local user.email "hr.fivem.dev@gmail.com"
+          git config --local user.email "your-email@example.com"
           git config --local user.name "GitHub Actions"
 
-      - name: Create Release Branch
+      - name: Checkout Release Tag
         run: |
-          git checkout -b release-${{ github.event.release.tag_name }}
-          git commit --allow-empty -m "push ${{ github.event.release.tag_name }}"
-          git push origin release-${{ github.event.release.tag_name }}
+          git fetch --tags
+          git checkout ${{ github.event.release.tag_name }}
 
-      - name: Merge Release into Main
+      - name: Merge into Main
         run: |
           git checkout main
-          git merge --no-ff release-${{ github.event.release.tag_name }}
+          git merge --no-ff ${{ github.event.release.tag_name }}
           git push origin main
-
-      - name: Clean Up
-        run: |
-          git branch -d release-${{ github.event.release.tag_name }}
