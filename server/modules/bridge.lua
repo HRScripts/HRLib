@@ -31,7 +31,7 @@ bridge.getName = function(playerId, nameType)
                 return select(nameType == 'firstname' and 1 or 2, clib.splitString(framework.GetPlayerFromId(playerId).getName(), ' '))
             end
         elseif bridge.type == 'qb' then
-            local player <const> = framework.GetPlayer(playerId)
+            local player <const> = framework.Functions.GetPlayer(playerId)
             return nameType == nil and ('%s %s'):format(player.PlayerData.charinfo.firstname, player.PlayerData.charinfo.lastname) or nameType == 'firstname' and player.PlayerData.charinfo.firstname or player.PlayerData.charinfo.lastname
         end
     end
