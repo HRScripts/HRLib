@@ -7,7 +7,7 @@ permissions:
   contents: write
 
 jobs:
-  rollback:
+  revert-commit:
     runs-on: ubuntu-latest
 
     steps:
