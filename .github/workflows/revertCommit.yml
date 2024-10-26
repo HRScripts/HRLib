@@ -22,5 +22,5 @@ jobs:
       - name: Revert Latest Commit
         run: |
           git checkout main
-          git reset --hard -q ORIG_HEAD
+          git reset --hard -q HEAD~1
           git push origin main
