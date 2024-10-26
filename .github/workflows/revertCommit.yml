@@ -25,8 +25,12 @@ jobs:
         run: |
           git revert HEAD --no-edit
 
-      - name: Push Changes
+      - name: Create Temporary Branch
+        run: |
+          git checkout -b temp-revert-branch
+
+      - name: Push Changes to Temporary Branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/HRScripts/HRLib.git main
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/HRScripts/HRLib.git temp-revert-branch
