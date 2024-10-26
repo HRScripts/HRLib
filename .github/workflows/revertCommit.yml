@@ -19,8 +19,14 @@ jobs:
           git config --local user.email "hr.fivem.dev@gmail.com"
           git config --local user.name "GitHub Actions"
 
-      - name: Revert Latest Commit
+      - name: Check Current Branch
+        run: |
+          git branch
+          git log --oneline -n 5
+
+      - name: Revert to Previous Commit
         run: |
           git checkout main
-          git reset --hard origin/main~1
-          git push origin main
+          git fetch origin
+          git reset --hard HEAD~1
+          git push origin main --force
