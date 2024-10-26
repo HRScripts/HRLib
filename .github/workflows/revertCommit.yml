@@ -4,8 +4,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  workflows: write  # Allow updating workflow files
+  contents: write  # Allow modifying repository contents
 
 jobs:
   revert-commit:
@@ -15,7 +14,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Fetch all history for the repository
 
       - name: Set up Git
         run: |
@@ -29,8 +28,8 @@ jobs:
 
       - name: Revert to Previous Commit
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}  # Use the PAT secret
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub token for authentication
         run: |
           git checkout main
           git reset --hard HEAD~1
-          git push https://$GITHUB_TOKEN@github.com/HRScripts/HRLib.git main --force
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/HRScripts/HRLib.git main --force
