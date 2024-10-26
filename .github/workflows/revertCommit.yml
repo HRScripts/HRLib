@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Set up Git
         run: |
@@ -22,11 +24,10 @@ jobs:
       - name: Check Current Branch
         run: |
           git branch
-          git log --oneline -n 5
+          git log --oneline -n 5  # Show the last 5 commits for debugging
 
       - name: Revert to Previous Commit
         run: |
           git checkout main
-          git fetch origin
-          git reset --hard HEAD~1
+          git reset --hard HEAD~1  # Use HEAD~1 directly
           git push origin main --force
