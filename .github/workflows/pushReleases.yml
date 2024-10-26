@@ -39,6 +39,6 @@ jobs:
           cd "$repo_name" || exit
           ls
           git status
-          git add .
+          git add -A
           git commit -m "$repo_name ${{steps.fetch_release.outputs.tag}}" || echo "No changes to commit"
           git push origin main
