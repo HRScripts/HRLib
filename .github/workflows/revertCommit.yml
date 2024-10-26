@@ -4,7 +4,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write  # Allow modifying repository contents
+  contents: write
+  actions: write
+  issues: write
 
 jobs:
   revert-commit:
@@ -14,7 +16,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0  # Fetch all history for the repository
+          fetch-depth: 0
 
       - name: Set up Git
         run: |
@@ -28,7 +30,7 @@ jobs:
 
       - name: Revert to Previous Commit
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub token for authentication
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git checkout main
           git reset --hard HEAD~1
