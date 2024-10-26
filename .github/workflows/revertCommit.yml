@@ -21,28 +21,12 @@ jobs:
           git config --local user.email "hr.fivem.dev@gmail.com"
           git config --local user.name "GitHub Actions"
 
-      - name: Create Temporary Branch
+      - name: Revert Latest Commit
         run: |
-          git checkout -b temp-revert-branch
+          git revert HEAD --no-edit
 
-      - name: Revert to Previous Commit
-        run: |
-          git reset --hard HEAD~1
-          
-          # Restore the workflows directory
-          git checkout HEAD -- .github/workflows/
-
-      - name: Push Temporary Branch
+      - name: Push Changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/HRScripts/HRLib.git temp-revert-branch
-
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          base: main
-          head: temp-revert-branch
-          title: "Revert latest commit"
-          body: "This PR reverts the latest commit on main."
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/HRScripts/HRLib.git main
