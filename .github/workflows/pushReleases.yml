@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  update-main:
+  push-release-to-main:
     runs-on: ubuntu-latest
 
     steps:
@@ -38,5 +38,5 @@ jobs:
           unrar x -o+ $repo_name.rar
           cd "$repo_name"
           git add .
-          git commit -m "$repo_name ${{steps.fetch_release.outputs.tag}}"
+          git commit -m "$repo_name ${{steps.fetch_release.outputs.tag}}" || echo "No changes to commit"
           git push origin main
