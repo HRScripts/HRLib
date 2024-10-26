@@ -5,7 +5,7 @@ on:
 
 permissions:
   contents: write
-  workflows: write
+  workflows: write  # Allow updating workflow files
 
 jobs:
   revert-commit:
@@ -25,10 +25,12 @@ jobs:
       - name: Check Current Branch
         run: |
           git branch
-          git log --oneline -n 5  # Show the last 5 commits for debugging
+          git log --oneline -n 5
 
       - name: Revert to Previous Commit
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}  # Use the PAT secret
         run: |
           git checkout main
-          git reset --hard HEAD~1  # Use HEAD~1 directly
-          git push origin main --force
+          git reset --hard HEAD~1
+          git push https://$GITHUB_TOKEN@github.com/HRScripts/HRLib.git main --force
