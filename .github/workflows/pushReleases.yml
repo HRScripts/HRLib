@@ -36,7 +36,7 @@ jobs:
           wget "https://github.com/HRScripts/$repo_name/releases/latest/download/$repo_name.rar"
           sudo apt-get install -y unrar
           unrar x -o+ $repo_name.rar
-          cd $repo_name
+          cd "$repo_name"
           git add .
           git commit -m "$repo_name ${{steps.fetch_release.outputs.tag}}"
           git push origin main
