@@ -172,7 +172,9 @@ end
 
 ---@return string[]
 hrlib.GetAllPedWeapons = function()
-    local pedWeapons <const>, playerPed <const> = {}, PlayerPedId()
+    local pedWeapons <const> = {}
+
+    local playerPed <const> = PlayerPedId()
     for i=1, #clib.allWeapons do
         if HasPedGotWeapon(playerPed, joaat(clib.allWeapons[i]), false) then
             pedWeapons[#pedWeapons+1] = clib.allWeapons[i]

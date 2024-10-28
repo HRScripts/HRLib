@@ -24,6 +24,7 @@
 ---@field ServerCallback fun(name: string, ...: ...?): any
 ---@field require fun(path: string): any Available in import method only!
 ---@field GetPlayers fun(): integer[]
+---@field GetAllPedWeapons fun(): string[]
 ---@field Keys table<string, integer>
 ---@field AllWeapons string[]
 ---@field AllPickups string[]
