@@ -170,6 +170,18 @@ hrlib.GetPlayers = function()
     return players
 end
 
+---@return string[]
+hrlib.GetAllPedWeapons = function()
+    local pedWeapons <const>, playerPed <const> = {}, PlayerPedId()
+    for i=1, #clib.allWeapons do
+        if HasPedGotWeapon(playerPed, joaat(clib.allWeapons[i]), false) then
+            pedWeapons[#pedWeapons+1] = clib.allWeapons[i]
+        end
+    end
+
+    return pedWeapons
+end
+
 ---@changelog version 1.0.0, version 1.1.0
 ---@version 1.1.0
 hrlib.Keys = clib.keys
