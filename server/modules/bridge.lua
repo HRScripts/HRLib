@@ -1,5 +1,16 @@
 local GetResourceState = GetResourceState
-local framework <const> = (GetResourceState('ox_core'):find('start') and setmetatable({}, {
+local oxStatus, esxStatus, qbStatus = GetResourceState('ox_core'), GetResourceState('es_extended'), GetResourceState('qb-core')
+if (oxStatus == 'missing' or oxStatus == 'stopped') and (esxStatus == 'missing' or esxStatus == 'stopped') and (qbStatus == 'missing' or qbStatus == 'stopped') then return false end
+
+if oxStatus == 'starting' or esxStatus == 'starting' or qbStatus == 'starting' then
+    while not oxStatus == 'started' or esxStatus == 'started' or qbStatus == 'started' do
+        oxStatus, esxStatus, qbStatus = GetResourceState('ox_core'), GetResourceState('es_extended'), GetResourceState('qb-core')
+
+        Wait(100)
+    end
+end
+
+local framework <const> = oxStatus == 'started' and setmetatable({}, {
     __index = function(self, k)
         if not rawget(self, k) then
             self[k] = function(...)
@@ -9,13 +20,13 @@ local framework <const> = (GetResourceState('ox_core'):find('start') and setmeta
 
         return self[k]
     end
-}) or GetResourceState('es_extended'):find('start') and exports.es_extended:getSharedObject() or GetResourceState('qb-core'):find('start')) and exports['qb-core']:GetCoreObject()
+}) or esxStatus == 'started' and exports.es_extended:getSharedObject() or qbStatus == 'started' and exports['qb-core']:GetCoreObject()
 
 if not framework then return false end
 
 local bridge <const>, clib <const> = {}, load(LoadResourceFile('HRLib', 'server/modules/local.lua'), '@@HRLib/server/modules/local.lua')()
 bridge.framework = framework
-bridge.type = GetResourceState('ox_core'):find('start') and 'ox' or GetResourceState('es_extended'):find('start') and 'esx' or GetResourceState('qb-core'):find('start') and 'qb'
+bridge.type = oxStatus == 'started' and 'ox' or esxStatus == 'started' and 'esx' or qbStatus == 'started' and 'qb'
 
 ---@param playerId integer
 ---@param nameType 'firstname'|'lastname'? Default: 'Firstname Lastname' (both two names in one string)
