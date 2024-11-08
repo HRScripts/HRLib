@@ -184,6 +184,16 @@ hrlib.GetAllPedWeapons = function()
     return pedWeapons
 end
 
+---@param blip integer
+---@param blipName string
+hrlib.SetBlipName = function(blip, blipName)
+    local commandId <const> = ('blip_%s_%s'):format(blip, blipName)
+
+    BeginTextCommandSetBlipName(commandId)
+    AddTextEntry(commandId, blipName)
+    EndTextCommandSetBlipName(blip)
+end
+
 ---@changelog version 1.0.0, version 1.1.0
 ---@version 1.1.0
 hrlib.Keys = clib.keys
