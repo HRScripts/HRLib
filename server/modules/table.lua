@@ -82,36 +82,35 @@ hrlib.table.getHashLength = function(hash)
     return length
 end
 
----@param tbl any[]
----@param index integer
----@param saveOldIndexes boolean? Save the old indexes numeration
----@return any[]? ( returns the table only if you use the export method for taking the lib's functions )
-hrlib.table.removeIndex = function(tbl, index, saveOldIndexes)
-    if type(tbl) == 'table' and table.type(tbl) == 'array' and tbl[index] then
-        if GetCurrentResourceName() ~= 'HRLib' then
-            local newTable <const> = {}
-
-            for i=1, #tbl do
-                if index ~= i then
-                    newTable[saveOldIndexes and i or #newTable+1] = tbl[i]
-                end
-            end
-
-            for k,v in pairs(_ENV) do
-                if type(v) == 'table' and table.type(v) == 'array' and v[1] == tbl[1] and #v == #tbl then
-                    _ENV[k] = newTable
+---this function is about to match a value from array with the given value as any type or as array again
+---@param tbl any[] the array to search in
+---@param value any|any[] the value or other array to match the main array with
+---@param returnIndex boolean? default: false
+---@return boolean, integer? tblIndex
+hrlib.table.find = function(tbl, value, returnIndex)
+    for i=1, #tbl do
+        if type(value) == 'table' then
+            for l=1, #value do
+                if tbl[i] == value[l] then
+                    if returnIndex then
+                        return true, i
+                    else
+                        return true
+                    end
                 end
             end
         else
-            for i=1, #tbl do
-                if index ~= i then
-                    tbl[saveOldIndexes and i or #tbl+1] = tbl[i]
+            if tbl[i] == value then
+                if returnIndex then
+                    return true, i
+                else
+                    return true
                 end
             end
-
-            return tbl
         end
     end
+
+    return false
 end
 
 return hrlib

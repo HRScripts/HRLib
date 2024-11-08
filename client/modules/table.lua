@@ -84,4 +84,35 @@ hrlib.table.getHashLength = function(hash)
     return length
 end
 
+---this function is about to match a value from array with the given value as any type or as array again
+---@param tbl any[] the array to search in
+---@param value any|any[] the value or other array to match the main array with
+---@param returnIndex boolean? default: false
+---@return boolean, integer? tblIndex
+hrlib.table.find = function(tbl, value, returnIndex)
+    for i=1, #tbl do
+        if type(value) == 'table' then
+            for l=1, #value do
+                if tbl[i] == value[l] then
+                    if returnIndex then
+                        return true, i
+                    else
+                        return true
+                    end
+                end
+            end
+        else
+            if tbl[i] == value then
+                if returnIndex then
+                    return true, i
+                else
+                    return true
+                end
+            end
+        end
+    end
+
+    return false
+end
+
 return hrlib
