@@ -1,4 +1,9 @@
 local interface <const> = {}
+local callbackStatus
+
+RegisterNUICallback('getTextUIStatus', function(data)
+    callbackStatus = data
+end)
 
 ---@param description string
 interface.showTextUI = function(description)
@@ -7,6 +12,25 @@ interface.showTextUI = function(description)
         visible = true,
         content = description
     })
+end
+
+---@param returnLastContent boolean?
+---@return boolean status, string? textUIContent
+interface.isTextUIOpen = function(returnLastContent)
+    SendNUIMessage({
+        action = 'getTextUIStatus'
+    })
+
+    repeat Wait(10) until callbackStatus ~= nil
+
+    local cbStatus = callbackStatus
+    callbackStatus = nil
+
+    if returnLastContent then
+        return cbStatus.status, cbStatus.content
+    else
+        return cbStatus.status
+    end
 end
 
 interface.hideTextUI = function()

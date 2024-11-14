@@ -9,5 +9,7 @@ window.addEventListener('message', function(event) {
         if (data.content) {
             buttonText.innerText = data.content;
         };
+    } else if (data.action === 'getTextUIStatus') {
+        $.post('https://HRLib/getTextUIStatus', JSON.stringify({ status: container.classList.contains('visible'), content: buttonText.innerText }), () => {}, 'json')
     };
 });
