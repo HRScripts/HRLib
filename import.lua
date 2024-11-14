@@ -1,6 +1,11 @@
 local serverSide <const>, resName <const> = IsDuplicityVersion(), GetCurrentResourceName()
 local hrlib <const>, clib <const>, _ <const> = load(LoadResourceFile('HRLib', ('%s/modules/functions.lua'):format(serverSide and 'server' or 'client')), ('@@HRLib/%s/modules/functions.lua'):format(serverSide and 'server' or 'client'))()
 local loadCallback <const>, sendCallback <const> = ('__%s:LoadHRLibCallback'):format(resName), ('__%s:SendHRLibCallback'):format(resName)
+local hrlibExport = exports.HRLib:getLibFunctions()
+hrlib.showTextUI = hrlibExport.showTextUI
+hrlib.isTextUIOpen = hrlibExport.isTextUIOpen
+hrlib.hideTextUI = hrlibExport.hideTextUI
+hrlib.progressBar = hrlibExport.progressBar
 
 ---@param name string the callback name
 ---@param isLocal boolean? By default it's false
