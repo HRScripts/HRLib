@@ -26,6 +26,7 @@
 ---@field GetPlayers fun(): integer[]
 ---@field GetAllPedWeapons fun(): string[]
 ---@field SetBlipName fun(blip: integer, blipName: string)
+---@field CreateBlip fun(data: { type: 'forCoord'|'forEntity'|'forArea'|'forPickup', label: string?, specificOptions: HRLibBlipForCoordOptions|HRLibBlipForEntityOptions|HRLibBlipForAreaOptions|HRLibBlipForPickupOptions, options: HRLibBlipOptions }): integer?
 ---@field Keys table<string, integer>
 ---@field AllWeapons string[]
 ---@field AllPickups string[]
@@ -155,3 +156,29 @@
 
 ---@class HRLibCloseFPlayer : HRLibClientFPlayer
 ---@field distance number
+
+---@class HRLibBlipOptions
+---@field coords vector3
+---@field sprite integer?
+---@field colour integer?
+---@field scale number?
+---@field alpha number?
+---@field asShortRange boolean?
+---@field category integer?
+---@field displayId integer?
+---@field flashBlip boolean?
+---@field flashInterval number?
+
+---@class HRLibBlipForCoordOptions
+---@field coords vector3
+
+---@class HRLibBlipForEntityOptions
+---@field entity integer
+
+---@class HRLibBlipForAreaOptions
+---@field coords vector3
+---@field width number
+---@field height number
+
+---@class HRLibBlipForPickupOptions
+---@field pickup integer
