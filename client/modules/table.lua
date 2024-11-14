@@ -85,15 +85,37 @@ hrlib.table.getHashLength = function(hash)
 end
 
 ---this function is about to match a value from array with the given value as any type or as array again
----@param tbl any[] the array to search in
----@param value any|any[] the value or other array to match the main array with
+---@param tbl any[]|table the array to search in
+---@param value any|any[]|table the value or other array to match the main array with
 ---@param returnIndex boolean? default: false
 ---@return boolean, integer? tblIndex
 hrlib.table.find = function(tbl, value, returnIndex)
-    for i=1, #tbl do
-        if type(value) == 'table' then
-            for l=1, #value do
-                if tbl[i] == value[l] then
+    if table.type(tbl) == 'array' then
+        for i=1, #tbl do
+            if type(value) == 'table' then
+                if table.type(value) == 'array' then
+                    for l=1, #value do
+                        if tbl[i] == value[l] then
+                            if returnIndex then
+                                return true, i
+                            else
+                                return true
+                            end
+                        end
+                    end
+                elseif table.type(value) == 'hash' then
+                    for _,v in pairs(value) do
+                        if tbl[i] == v then
+                            if returnIndex then
+                                return true, i
+                            else
+                                return true
+                            end
+                        end
+                    end
+                end
+            else
+                if tbl[i] == value then
                     if returnIndex then
                         return true, i
                     else
@@ -101,12 +123,38 @@ hrlib.table.find = function(tbl, value, returnIndex)
                     end
                 end
             end
-        else
-            if tbl[i] == value then
-                if returnIndex then
-                    return true, i
-                else
-                    return true
+        end
+    elseif table.type(tbl) == 'hash' then
+        for k,v in pairs(tbl) do
+            if type(value) == 'table' then
+                if table.type(value) == 'array' then
+                    for l=1, #value do
+                        if v == value[l] then
+                            if returnIndex then
+                                return true, k
+                            else
+                                return true
+                            end
+                        end
+                    end
+                elseif table.type(value) == 'hash' then
+                    for _,vvalue in pairs(value) do
+                        if v == vvalue then
+                            if returnIndex then
+                                return true, k
+                            else
+                                return true
+                            end
+                        end
+                    end
+                end
+            else
+                if v == value then
+                    if returnIndex then
+                        return true, k
+                    else
+                        return true
+                    end
                 end
             end
         end
