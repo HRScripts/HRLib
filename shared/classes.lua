@@ -18,7 +18,7 @@
 ---@field Notify fun(description: string?, type: 'success'|'info'|'error'|'warning'?, duration: number?, pos: 'top-right'|'center-right'|'bottom-right'|'frombelow-right'|'top-left'|'left-center'|'frombelow-left'?, sound: boolean?)
 ---@field RegCommand fun(name: string, cb: fun(args: string[]|any[]?, rawCommand: any, IPlayer: HRLibClientIPlayer, FPlayer: HRLibClientFPlayer), suggestions: { help: string?, args: table[]? }?)
 ---@field string { split: fun(text: string, key: string, returnAllAs: 'string'|'number'?, isArray: boolean?): ...|string[]|number[]?, gather: fun(source: string, key: string): string? }
----@field table { focusedArray: fun(array: table[], focus: table, cb: fun(i: integer, curr: table)), focusedHash: fun(hash: table, focus: table|any, cb: fun(key: string, value: any[], arrayInfo: { i: integer, curr: table })), getHashLength: fun(hash: table): integer, removeIndex: fun(tbl: any[], index: integer, saveOldIndexes: boolean): any[]?, find: fun(tbl: any[], value: any|any[], returnIndex: boolean?): boolean }
+---@field table HRLibTableFunctions
 ---@field CreateCallback fun(name: string, isLocal: boolean?, cb: fun(...: ...?): ...|any) isLocal is not available in the export method!! In the export method, the parameters are name and cb
 ---@field Callback fun(name: string, ...: ...?): any
 ---@field ServerCallback fun(name: string, ...: ...?): any
@@ -59,7 +59,7 @@
 ---@field DoesIdExist fun(playerId: integer?): boolean
 ---@field RegCommand fun(name: string, accessFromConsole: boolean, accessFromInGame: boolean, cb: fun(args: string[]|any[]?, rawCommand: any?, IPlayer: HRLibServerIPlayer, FPlayer: HRLibServerFPlayer), isPlayerAllowed: boolean?, suggestions: { help: string?, restricted: boolean, args: table[]? }?)
 ---@field string { split: fun(text: string, key: string, returnAllAs: 'string'|'number'?, isArray: boolean?): string[]|number[]|...?, gather: fun(text: string, key: string?): string? }
----@field table { focusedArray: fun(array: table[], focus: table, cb: fun(i: integer, curr: table)), focusedHash: fun(hash: table, focus: table|any, cb: fun(key: string, value: any[], arrayInfo: { i: integer, curr: table })), getHashLength: fun(hash: table): integer, removeIndex: fun(tbl: any[], index: integer, saveOldIndexes: boolean): any[]?, find: fun(tbl: any[], value: any|any[], returnIndex: boolean?): boolean }
+---@field table HRLibTableFunctions
 ---@field CreateCallback fun(name: string, isLocal: boolean?, cb: fun(...: ...?): ...|any) isLocal is not available in the export method!! In the export method, the parameters are name and cb
 ---@field Callback fun(name: string, ...: ...?): any? 
 ---@field ClientCallback fun(name: string, playerId: integer?, ...: ...?): any?
@@ -184,3 +184,9 @@
 
 ---@class HRLibBlipForPickupOptions
 ---@field pickup integer
+
+---@class HRLibTableFunctions
+---@field focusedArray fun(array: table[], focus: table, cb: fun(i: integer, curr: table))
+---@field focusedHash fun(hash: table, focus: table|any, cb: fun(key: string, value: any[], arrayInfo: { i: integer, curr: table }))
+---@field getHashLength fun(hash: table): integer
+---@field find fun(tbl: any[], value: any|any[], returnIndex: boolean?): boolean
