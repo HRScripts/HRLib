@@ -39,6 +39,9 @@
 ---@field OnPlSpawn fun(cb: fun()) Available in import method only!
 ---@field OnPlDisc fun(cb: fun()) Available in import method only!
 ---@field getNUIValue fun(key: string): any Available in import method only!
+---@field showTextUI fun(description: string)
+---@field isTextUIOpen fun(returnLastDescription: boolean): boolean, string?
+---@field hideTextUI function
 
 ---@class HRLibServerFunctions
 ---@field DiscordMsg fun(webHook: string, botName: string, title: string, message: string, type: string?, color: integer, icon: string, author: string)
@@ -158,7 +161,6 @@
 ---@field distance number
 
 ---@class HRLibBlipOptions
----@field coords vector3
 ---@field sprite integer?
 ---@field colour integer?
 ---@field scale number?

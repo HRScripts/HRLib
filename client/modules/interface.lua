@@ -14,9 +14,9 @@ interface.showTextUI = function(description)
     })
 end
 
----@param returnLastContent boolean?
+---@param returnLastDescription boolean?
 ---@return boolean status, string? textUIContent
-interface.isTextUIOpen = function(returnLastContent)
+interface.isTextUIOpen = function(returnLastDescription)
     SendNUIMessage({
         action = 'getTextUIStatus'
     })
@@ -26,7 +26,7 @@ interface.isTextUIOpen = function(returnLastContent)
     local cbStatus = callbackStatus
     callbackStatus = nil
 
-    if returnLastContent then
+    if returnLastDescription then
         return cbStatus.status, cbStatus.content
     else
         return cbStatus.status
