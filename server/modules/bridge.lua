@@ -22,7 +22,16 @@ local framework <const> = oxStatus == 'started' and setmetatable({}, {
     end
 }) or esxStatus == 'started' and exports.es_extended:getSharedObject() or qbStatus == 'started' and exports['qb-core']:GetCoreObject()
 
-if not framework then return false end
+if not framework then
+    local err = function() error(GetCurrentResourceName() ~= 'HRLib' and 'No framework found!' or ('No framework found! Invoking resource: %s'):format(GetInvokingResource())) end
+    return {
+        getName = err,
+        getJob = err,
+        getMoney = err,
+        setJob = err,
+        setMoney = err,
+    }
+end
 
 local bridge <const>, clib <const> = {}, load(LoadResourceFile('HRLib', 'server/modules/local.lua'), '@@HRLib/server/modules/local.lua')()
 bridge.framework = framework
