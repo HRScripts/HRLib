@@ -60,6 +60,7 @@
 ---@field RegCommand fun(name: string, accessFromConsole: boolean, accessFromInGame: boolean, cb: fun(args: string[]|any[]?, rawCommand: any?, IPlayer: HRLibServerIPlayer, FPlayer: HRLibServerFPlayer), isPlayerAllowed: boolean?, suggestions: { help: string?, restricted: boolean, args: table[]? }?)
 ---@field string { split: fun(text: string, key: string, returnAllAs: 'string'|'number'?, isArray: boolean?): string[]|number[]|...?, gather: fun(text: string, key: string?): string? }
 ---@field table HRLibTableFunctions
+---@field bridge HRLibServerBridge
 ---@field CreateCallback fun(name: string, isLocal: boolean?, cb: fun(...: ...?): ...|any) isLocal is not available in the export method!! In the export method, the parameters are name and cb
 ---@field Callback fun(name: string, ...: ...?): any? 
 ---@field ClientCallback fun(name: string, playerId: integer?, ...: ...?): any?
@@ -190,3 +191,10 @@
 ---@field focusedHash fun(hash: table, focus: table|any, cb: fun(key: string, value: any[], arrayInfo: { i: integer, curr: table }))
 ---@field getHashLength fun(hash: table): integer
 ---@field find fun(tbl: any[], value: any|any[], returnIndex: boolean?): boolean
+
+---@class HRLibServerBridge
+---@field getName fun(playerId: integer, nameType: 'firstname'|'lastname'?): string
+---@field getJob fun(playerId: integer, returnGrade: boolean?): string, integer?
+---@field getMoney fun(playerId: integer, account: 'cash'|'bank'): integer?
+---@field setJob fun(playerId: integer, jobName: string, jobGrade: integer)
+---@field setMoney fun(playerId: integer, account: 'cash'|'bank', amount: integer)
