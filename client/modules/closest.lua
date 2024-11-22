@@ -6,7 +6,7 @@ local closestFuncs <const>, clib <const> = {}, load(LoadResourceFile('HRLib', 'c
 ---@version 2.0.0
 ---@return { ped: integer, distance: number }? closestPed, { ped: integer, distance: number }[]? closePeds
 closestFuncs.ClosestPed = function(Id, returnClosePeds)
-    local ped <const> = (type(Id) == 'number' and clib.DoesIdExist(Id)) and GetPlayerPed(GetPlayerFromServerId(Id)) or type(Id) == 'nil' and PlayerPedId() or Id --[[@as integer]]
+    local ped <const> = type(Id) == 'number' and GetPlayerPed(GetPlayerFromServerId(Id)) or type(Id) == 'nil' and PlayerPedId() or Id --[[@as integer]]
     local pedCoords <const> = GetEntityCoords(ped)
     local closestPed
 
@@ -68,7 +68,7 @@ end
 ---@version 1.0.0
 ---@return { entity: integer, distance: number }? closestObject, { entity: integer, distance: number }[]? closeObjects
 closestFuncs.ClosestObject = function(Id, returnCloseObjects)
-    local objects <const>, playerCoords <const> = GetGamePool('CObject'), Id and (clib.DoesIdExist(Id) and GetEntityCoords(GetPlayerPed(GetPlayerFromServerId(Id))) or GetEntityCoords(PlayerPedId())) or GetEntityCoords(PlayerPedId())
+    local objects <const>, playerCoords <const> = GetGamePool('CObject'), Id and GetEntityCoords(GetPlayerPed(GetPlayerFromServerId(Id)) or GetEntityCoords(PlayerPedId())) or GetEntityCoords(PlayerPedId())
     local closestObject
 
     for i=1, #objects do

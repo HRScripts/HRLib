@@ -20,7 +20,14 @@ local hrlib <const>, clib <const>, fplayer <const> = setmetatable({
 ---@version 1.0.0
 ---@return boolean
 hrlib.DoesIdExist = function(playerId)
-    return clib.DoesIdExist(playerId)
+    local players <const> = hrlib.GetPlayers() ---@diagnostic disable-line: deprecated
+    for i=1, #players do
+        if players[i] == playerId then
+            return true
+        end
+    end
+
+    return false
 end
 
 ---@param playerId integer existing player server Id
@@ -28,7 +35,9 @@ end
 ---@version 1.0.0
 ---@return HRLibClientIPlayer?
 hrlib.GetIPlayer = function(playerId)
-    return clib.GetIPlayer(playerId)
+    if hrlib.DoesIdExist(playerId) then ---@diagnostic disable-line: deprecated
+        return clib.GetIPlayer(playerId)
+    end
 end
 
 ---@param playerId integer existing player server Id
@@ -36,7 +45,9 @@ end
 ---@version 1.0.0
 ---@return HRLibClientFPlayer?
 hrlib.GetFPlayer = function(playerId)
-    return fplayer:newObject(playerId)
+    if hrlib.DoesIdExist(playerId) then ---@diagnostic disable-line: deprecated
+        return fplayer:newObject(playerId)
+    end
 end
 
 ---@param vehModel string|integer existing vehicle model or model hash

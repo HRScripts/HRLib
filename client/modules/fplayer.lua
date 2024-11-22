@@ -21,7 +21,7 @@ end
 ---@changelog version 1.0.0, version 2.0.0
 ---@version 2.0.0
 function fplayer:Teleport(coords)
-    if type(coords) ~= 'vector3' or not clib.DoesIdExist(self.id) then return end
+    if type(coords) ~= 'vector3' then return end
 
     SetEntityCoordsNoOffset(GetPlayerPed(GetPlayerFromServerId(self.id)), coords) ---@diagnostic disable-line: missing-parameter, param-type-mismatch
 end
@@ -33,8 +33,6 @@ end
 ---@changelog version 1.0.0
 ---@version 1.0.0
 function fplayer:SpawnVehicle(vehModel, spawnPedInside, saveVehicle)
-    if not clib.DoesIdExist(self.id) then return end
-
     local model <const>, ped <const> = joaat(vehModel), GetPlayerPed(GetPlayerFromServerId(self.id))
 
     RequestModel(model)
@@ -64,8 +62,6 @@ end
 ---@changelog version 1.0.0
 ---@version 1.0.0
 function fplayer:Freeze(toggle)
-    if not clib.DoesIdExist(self.id) then return end
-
     local ped <const> = GetPlayerPed(GetPlayerFromServerId(self.id))
     toggle = toggle or false
 
@@ -79,8 +75,6 @@ end
 ---@changelog version 1.0.0
 ---@version 1.0.0
 function fplayer:Health(health)
-    if not clib.DoesIdExist(self.id) then return end
-
     local ped <const> = GetPlayerPed(GetPlayerFromServerId(self.id))
     SetEntityHealth(ped, health or (IsPedMale(ped) and 200 or 100))
 end
@@ -89,8 +83,6 @@ end
 ---@changelog version 1.0.0
 ---@version 1.0.0
 function fplayer:Invincible(toggle)
-    if not clib.DoesIdExist(self.id) then return end
-
     SetPlayerInvincible(GetPlayerFromServerId(self.id), toggle or false)
 end
 

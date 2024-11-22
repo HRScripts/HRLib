@@ -39,30 +39,6 @@ local clib <const> = {
     }
 }
 
----@param playerId integer? An existing player server Id
-clib.DoesIdExist = function(playerId)
-    if not playerId then return false end
-
-    local players = {}
-    playerId = tonumber(playerId)
-
-    for i=1, 100000 do
-        if #players == GetNumberOfPlayers() then break end
-
-        if GetPlayerFromServerId(i) ~= -1 then
-            players[#players+1] = i
-        end
-    end
-
-    for i=1, #players do
-        if playerId == players[i] then
-            return true
-        end
-    end
-
-    return false
-end
-
 clib.Notify = function(description, type, duration, pos, sound)
     if GetCurrentResourceName() ~= 'HRLib' then
         TriggerEvent('HRLib:Notify', description, type, duration, pos, sound)
@@ -74,9 +50,9 @@ end
 ---@param playerId integer An existing player server Id
 ---@return HRLibClientIPlayer?
 clib.GetIPlayer = function(playerId)
-    if playerId == nil or type(playerId) ~= 'number' or not clib.DoesIdExist(playerId) then
+    if playerId == nil or type(playerId) ~= 'number' then
         return nil
-    elseif clib.DoesIdExist(playerId) then
+    else
         local p <const> = GetPlayerPed(GetPlayerFromServerId(playerId))
         local coo <const> = GetEntityCoords(p)
         return {
