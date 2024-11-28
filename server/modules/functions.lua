@@ -479,6 +479,37 @@ if GetCurrentResourceName() == 'HRLib' then
     end
 end
 
+---@param values any[]
+---@param createRandomValue fun(): any
+hrlib.RandomValueWithNoRepetition = function(values, createRandomValue)
+    if type(createRandomValue) == 'function' then
+        local randomValue = createRandomValue()
+        local found
+
+        for i=1, #values do
+            if randomValue == values[i] then
+                found = true
+            end
+        end
+
+        if found then
+            while found do
+                randomValue = createRandomValue()
+
+                for i=1, #values do
+                    if randomValue == values[i] then
+                        found = true
+                    end
+                end
+
+                Wait(0)
+            end
+        end
+
+        return randomValue
+    end
+end
+
 hrlib.AllWeapons = clib.allWeapons
 
 local modules <const> = { 'bridge', 'import', 'string', 'table' }

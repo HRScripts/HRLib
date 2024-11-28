@@ -198,8 +198,7 @@ end
 ---@param blip integer
 ---@param blipName string
 hrlib.SetBlipName = function(blip, blipName)
-    local commandId <const> = ('blip_%s_%s'):format(blip, blipName)
-
+    local commandId <const> = ('blip_%s_%s'):format(blip, math.random(10000000))
     BeginTextCommandSetBlipName(commandId)
     AddTextEntry(commandId, blipName)
     EndTextCommandSetBlipName(blip)
@@ -237,6 +236,37 @@ hrlib.CreateBlip = function(data)
     end
 
     return blip
+end
+
+---@param values any[]
+---@param createRandomValue fun(): any
+hrlib.RandomValueWithNoRepetition = function(values, createRandomValue)
+    if type(createRandomValue) == 'function' then
+        local randomValue = createRandomValue()
+        local found
+
+        for i=1, #values do
+            if randomValue == values[i] then
+                found = true
+            end
+        end
+
+        if found then
+            while found do
+                randomValue = createRandomValue()
+
+                for i=1, #values do
+                    if randomValue == values[i] then
+                        found = true
+                    end
+                end
+
+                Wait(0)
+            end
+        end
+
+        return randomValue
+    end
 end
 
 ---@changelog version 1.0.0, version 1.1.0
