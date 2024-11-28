@@ -95,31 +95,69 @@ hrlib.table.find = function(tbl, value, returnIndex)
             if type(value) == 'table' then
                 if table.type(value) == 'array' then
                     for l=1, #value do
-                        if tbl[i] == value[l] then
-                            if returnIndex then
-                                return true, i
-                            else
-                                return true
+                        if type(tbl[i]) ~= 'table' then
+                            if tbl[i] == value[l] then
+                                if returnIndex then
+                                    return true, i
+                                else
+                                    return true
+                                end
+                            end
+                        elseif table.type(tbl[i]) == 'hash' then
+                            for _,v in pairs(tbl[i]) do
+                                if v == value[l] then
+                                    if returnIndex then
+                                        return true, i
+                                    else
+                                        return true
+                                    end
+                                end
                             end
                         end
                     end
                 elseif table.type(value) == 'hash' then
-                    for _,v in pairs(value) do
-                        if tbl[i] == v then
-                            if returnIndex then
-                                return true, i
-                            else
-                                return true
+                    if type(tbl[i]) ~= 'table' then
+                        for _,v in pairs(value) do
+                            if tbl[i] == v then
+                                if returnIndex then
+                                    return true, i
+                                else
+                                    return true
+                                end
+                            end
+                        end
+                    elseif table.type(tbl[i]) == 'hash' then
+                        for _,v in pairs(value) do
+                            for _,tblV in pairs(tbl[i]) do
+                                if tblV == v then
+                                    if returnIndex then
+                                        return true, i
+                                    else
+                                        return true
+                                    end
+                                end
                             end
                         end
                     end
                 end
             else
-                if tbl[i] == value then
-                    if returnIndex then
-                        return true, i
-                    else
-                        return true
+                if type(tbl[i]) ~= 'table' then
+                    if tbl[i] == value then
+                        if returnIndex then
+                            return true, i
+                        else
+                            return true
+                        end
+                    end
+                else
+                    for _,v in pairs(tbl[i]) do
+                        if v == value then
+                            if returnIndex then
+                                return true, i
+                            else
+                                return true
+                            end
+                        end
                     end
                 end
             end
