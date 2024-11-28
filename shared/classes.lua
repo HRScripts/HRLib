@@ -74,7 +74,6 @@
 ---@field OnServerStop fun(resName: string|'any'?, cb: fun(resource: string)) Available in import method only!
 ---@field OnPlConnecting fun(cb: fun(source: integer, playerName: string, setKickReason: string, deferrals: table)) Available in import method only!
 ---@field OnPlJoining fun(cb: fun(source: integer)) Available in import method only!
----@field OnPlSpawn fun(cb: fun(source: integer)) Available in import method only!
 ---@field OnPlDisc fun(cb: fun(source: integer)) Available in import method only!
 
 ---@class HRLibClientFPlayer
