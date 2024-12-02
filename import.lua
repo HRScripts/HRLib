@@ -266,3 +266,34 @@ HRLib = hrlib
 if not GetResourceMetadata(resName, 'remove_translator_import', 0) then
     hrlib.require('@HRLib/translator.lua')
 end
+
+if IsDuplicityVersion() then
+    if not GetResourceMetadata(resName, 'remove_versionCheck', 0) then
+        local repository, matchCode <const> = GetResourceMetadata(resName, 'repository', 0), '%d+%.%d+%.%d+'
+        if type(repository) == 'string' then
+            repository = repository:sub(repository - #'https://github.com/', #'https://github.com/')
+            if repository:find('/') then
+                local currVersion <const> = (GetResourceMetadata(resName, 'version', 0) or ''):match(matchCode)
+                if currVersion then
+                    SetTimeout(1100, function()
+                        PerformHttpRequest(('https://api.github.com/repos/%s/releases/latest'):format(repository), function(status, body)
+                            if status ~= 200 then return end
+
+                            body = json.decode(body)
+
+                            if not body.prerelease then
+                                local latestVersion <const> = body.tag_name:match(matchCode)
+
+                                if not latestVersion or latestVersion == currVersion then return end
+
+                                if tonumber(hrlib.string.gather(HRLib.string.split(latestVersion, '.', nil, true), '')) > tonumber(hrlib.string.gather(HRLib.string.split(currVersion, '.', nil, true), '')) then
+                                    print(('^3The resource %s is outdated. Current version: %s. Please update it! \nURL: %s^0'):format(resName, currVersion, body.html_url))
+                                end
+                            end
+                        end)
+                    end)
+                end
+            end
+        end
+    end
+end
