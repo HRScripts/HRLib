@@ -195,15 +195,6 @@ hrlib.GetAllPedWeapons = function()
     return pedWeapons
 end
 
----@param blip integer
----@param blipName string
-hrlib.SetBlipName = function(blip, blipName)
-    local commandId <const> = ('blip_%s_%s'):format(blip, math.random(10000000))
-    BeginTextCommandSetBlipName(commandId)
-    AddTextEntry(commandId, blipName)
-    EndTextCommandSetBlipName(blip)
-end
-
 ---@param data { type: 'forCoord'|'forEntity'|'forArea'|'forPickup', label: string?, specificOptions: HRLibBlipForCoordOptions|HRLibBlipForEntityOptions|HRLibBlipForAreaOptions|HRLibBlipForPickupOptions, options: HRLibBlipOptions }
 ---@return integer? blip
 hrlib.CreateBlip = function(data)
@@ -223,7 +214,12 @@ hrlib.CreateBlip = function(data)
     end
 
     if type(options) == 'table' then
-        if data.label then hrlib.SetBlipName(blip, data.label) end
+        if data.label then
+            BeginTextCommandSetBlipName(('blip_%s'):format(data.label))
+            AddTextEntry(('blip_%s'):format(data.label), data.label)
+            EndTextCommandSetBlipName(blip)
+        end
+
         if options.sprite then SetBlipSprite(blip, options.sprite) end
         if options.colour then SetBlipColour(blip, options.colour) end
         if options.alpha then SetBlipAlpha(blip, options.alpha) end

@@ -25,7 +25,6 @@
 ---@field require fun(path: string): any Available in import method only!
 ---@field GetPlayers fun(): integer[]
 ---@field GetAllPedWeapons fun(): string[]
----@field SetBlipName fun(blip: integer, blipName: string)
 ---@field CreateBlip fun(data: { type: 'forCoord'|'forEntity'|'forArea'|'forPickup', label: string?, specificOptions: HRLibBlipForCoordOptions|HRLibBlipForEntityOptions|HRLibBlipForAreaOptions|HRLibBlipForPickupOptions, options: HRLibBlipOptions }): integer?
 ---@field Keys table<string, integer>
 ---@field AllWeapons string[]
@@ -190,6 +189,7 @@
 ---@field focusedHash fun(hash: table, focus: table|any, cb: fun(key: string, value: any[], arrayInfo: { i: integer, curr: table }))
 ---@field getHashLength fun(hash: table): integer
 ---@field find fun(tbl: any[], value: any|any[], returnIndex: boolean?): boolean
+---@field deepclone fun(tbl: table): table
 
 ---@class HRLibServerBridge
 ---@field getName fun(playerId: integer, nameType: 'firstname'|'lastname'?): string
