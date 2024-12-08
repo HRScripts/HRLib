@@ -199,4 +199,15 @@ hrlib.table.find = function(tbl, value, returnIndex)
     return false
 end
 
+---@param tbl table
+hrlib.table.deepclone = function(tbl)
+    local table = {}
+
+    for k,v in pairs(tbl) do
+        table[k] = type(v) == 'table' and hrlib.table.deepclone(v) or v
+    end
+
+    return table
+end
+
 return hrlib
