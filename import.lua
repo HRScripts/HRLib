@@ -233,7 +233,6 @@ else
 
         for k,v in pairs(clib.RegisteredCmds) do
             if type(v.suggestions) == 'table' and table.type(v.suggestions) ~= 'empty' then
-                print(v.suggestions.help, v.suggestions.args?[1])
                 TriggerEvent('chat:addSuggestion', ('/%s'):format(k), v.suggestions.help or '', v.suggestions.args or {})
             end
         end
@@ -271,12 +270,12 @@ if IsDuplicityVersion() then
     if not GetResourceMetadata(resName, 'remove_versionCheck', 0) then
         local repository, matchCode <const> = GetResourceMetadata(resName, 'repository', 0), '%d+%.%d+%.%d+'
         if type(repository) == 'string' then
-            repository = repository:sub(repository - #'https://github.com/', #'https://github.com/')
+            repository = repository:sub(#repository - #'https://github.com/', #repository)
             if repository:find('/') then
                 local currVersion <const> = (GetResourceMetadata(resName, 'version', 0) or ''):match(matchCode)
                 if currVersion then
-                    SetTimeout(1100, function()
-                        PerformHttpRequest(('https://api.github.com/repos/%s/releases/latest'):format(repository), function(status, body)
+                    SetTimeout(1500, function()
+                        PerformHttpRequest(('https://api.github.com/repos%s/releases/latest'):format(repository), function(status, body)
                             if status ~= 200 then return end
 
                             body = json.decode(body)
