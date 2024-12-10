@@ -2,12 +2,14 @@ local streaming <const> = {}
 
 ---@param model string|integer|string[]|integer[]
 streaming.RequestModel = function(model)
-    if type(model) ~= 'string' and type(model) ~= 'number' and type(model) ~= 'table' then return end
+    if type(model) ~= 'table' and (type(model) ~= 'string' or not IsModelValid(model)) then
+        return error(('The script couldn\'t load non-existent model (%s)'):format(model or 'undefined'), 2)
+    end
 
     if type(model) ~= 'table' then
         model = type(model) == 'number' and model or joaat(model)
 
-        if model then
+        if model and IsModelValid(model) then
             RequestModel(model)
 
             local timesChecked = 0
@@ -18,12 +20,14 @@ streaming.RequestModel = function(model)
 
                 timesChecked += 1
             end
+        else
+            return error(('The script couldn\'t load non-existent model (%s)'):format(model or 'undefined'), 2)
         end
     elseif table.type(model) == 'array' then
         for i=1, #model do
             model[i] = type(model[i]) == 'number' and model[i] or joaat(model[i])
 
-            if model[i] then
+            if model[i] and IsModelValid(model[i]) then
                 RequestModel(model[i])
 
                 local timesChecked = 0
@@ -34,6 +38,8 @@ streaming.RequestModel = function(model)
 
                     timesChecked += 1
                 end
+            else
+                return error(('The script couldn\'t load non-existent model (%s)'):format(model or 'undefined'), 2)
             end
         end
     end
@@ -41,7 +47,9 @@ end
 
 ---@param dict string|string[]
 streaming.RequestAnimDict = function(dict)
-    if type(dict) ~= 'string' and type(dict) ~= 'table' then return end
+    if type(dict) ~= 'table' and not DoesAnimDictExist(dict) then
+        return error(('The script couldn\'t load non-existent animation dictionary (%s)'):format(dict or 'undefined'), 2)
+    end
 
     if type(dict) ~= 'table' then
         RequestAnimDict(dict)
@@ -56,7 +64,7 @@ streaming.RequestAnimDict = function(dict)
         end
     elseif table.type(dict) == 'array' then
         for i=1, #dict do
-            if type(dict[i]) == 'string' then
+            if type(dict[i]) == 'string' and DoesAnimDictExist(dict[i]) then
                 RequestAnimDict(dict[i])
 
                 local timesChecked = 0
@@ -67,6 +75,8 @@ streaming.RequestAnimDict = function(dict)
 
                     timesChecked += 1
                 end
+            else
+                return error(('The script couldn\'t load non-existent animation dictionary (%s)'):format(dict or 'undefined'), 2)
             end
         end
     end
