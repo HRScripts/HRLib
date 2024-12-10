@@ -188,7 +188,7 @@
 ---@field focusedArray fun(array: table[], focus: table, cb: fun(i: integer, curr: table))
 ---@field focusedHash fun(hash: table, focus: table|any, cb: fun(key: string, value: any[], arrayInfo: { i: integer, curr: table }))
 ---@field getHashLength fun(hash: table): integer
----@field find fun(tbl: any[], value: any|any[], returnIndex: boolean?): boolean
+---@field find fun(tbl: any[], value: any|any[], returnIndex: boolean?, isValueKey: boolean?): boolean
 ---@field deepclone fun(tbl: table): table
 
 ---@class HRLibServerBridge
