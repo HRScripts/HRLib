@@ -2,7 +2,7 @@ local streaming <const> = {}
 
 ---@param model string|integer|string[]|integer[]
 streaming.RequestModel = function(model)
-    if type(model) ~= 'table' and (type(model) ~= 'string' or not IsModelValid(model)) then
+    if type(model) ~= 'table' and not IsModelValid(model) then
         return error(('The script couldn\'t load non-existent model (%s)'):format(model or 'undefined'), 2)
     end
 
