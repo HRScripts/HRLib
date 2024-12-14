@@ -458,7 +458,7 @@ if GetCurrentResourceName() == 'HRLib' then
     ---@param name string the callback name
     ---@param playerId integer? An existing player server Id or nil (if nil, the player server Id will be set to -1 or if the player server Id does not exist, it will be set to -1)
     ---@param ... any?
-    ---@return any?
+    ---@return ...|any?
     hrlib.ClientCallback = function(name, playerId, ...)
         clib.CallbacksPromises[name] = promise.new()
 

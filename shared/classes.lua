@@ -25,7 +25,7 @@
 ---@field require fun(path: string): any Available in import method only!
 ---@field GetPlayers fun(): integer[]
 ---@field GetAllPedWeapons fun(): string[]
----@field CreateBlip fun(data: { type: 'forCoord'|'forEntity'|'forArea'|'forPickup', label: string?, specificOptions: HRLibBlipForCoordOptions|HRLibBlipForEntityOptions|HRLibBlipForAreaOptions|HRLibBlipForPickupOptions, options: HRLibBlipOptions }): integer?
+---@field CreateBlip fun(data: { type: 'forCoord'|'forEntity'|'forArea'|'forPickup', specificOptions: HRLibBlipForCoordOptions|HRLibBlipForEntityOptions|HRLibBlipForAreaOptions|HRLibBlipForPickupOptions, options: HRLibBlipOptions }): integer?
 ---@field Keys table<string, integer>
 ---@field AllWeapons string[]
 ---@field AllPickups string[]

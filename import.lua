@@ -58,7 +58,7 @@ if serverSide then
     ---@param name string the callback name
     ---@param playerId integer? An existing player server Id or nil (if nil, the player server Id will be set to -1 or if the player server Id does not exist, it will be set to -1)
     ---@param ... any?
-    ---@return any?
+    ---@return ...|any?
     hrlib.ClientCallback = function(name, playerId, ...)
         clib.CallbacksPromises[name] = promise.new()
 
@@ -170,7 +170,7 @@ else
     ---@param ... any
     ---@changelog version 1.0.0
     ---@version 1.0.0
-    ---@return any?
+    ---@return ...|any?
     hrlib.ServerCallback = function(name, ...)
         clib.CallbacksPromises[name] = promise.new()
 

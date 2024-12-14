@@ -147,7 +147,7 @@ if GetCurrentResourceName() == 'HRLib' then
     ---@param ... any
     ---@changelog version 1.0.0
     ---@version 1.0.0
-    ---@return any?
+    ---@return ...|any?
     hrlib.ServerCallback = function(name, ...)
         clib.CallbacksPromises[name] = promise.new()
 
@@ -195,7 +195,7 @@ hrlib.GetAllPedWeapons = function()
     return pedWeapons
 end
 
----@param data { type: 'forCoord'|'forEntity'|'forArea'|'forPickup', label: string?, specificOptions: HRLibBlipForCoordOptions|HRLibBlipForEntityOptions|HRLibBlipForAreaOptions|HRLibBlipForPickupOptions, options: HRLibBlipOptions }
+---@param data { type: 'forCoord'|'forEntity'|'forArea'|'forPickup', specificOptions: HRLibBlipForCoordOptions|HRLibBlipForEntityOptions|HRLibBlipForAreaOptions|HRLibBlipForPickupOptions, options: HRLibBlipOptions }
 ---@return integer? blip
 hrlib.CreateBlip = function(data)
     local blip
@@ -214,12 +214,6 @@ hrlib.CreateBlip = function(data)
     end
 
     if type(options) == 'table' then
-        if data.label then
-            BeginTextCommandSetBlipName(('blip_%s'):format(data.label))
-            AddTextEntry(('blip_%s'):format(data.label), data.label)
-            EndTextCommandSetBlipName(blip)
-        end
-
         if options.sprite then SetBlipSprite(blip, options.sprite) end
         if options.colour then SetBlipColour(blip, options.colour) end
         if options.alpha then SetBlipAlpha(blip, options.alpha) end
