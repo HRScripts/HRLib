@@ -1,11 +1,11 @@
 local hrlib <const>, clib <const> = { table = {} }, load(LoadResourceFile('HRLib', 'server/modules/local.lua'), '@@HRLib/server/modules/local.lua')()
 
 ---this function helps you focus in array of tables by one or couple of identifiers in each table of the array and if the identifiers's value match, the cb function is triggered
----@param array table[]
----@param focus table
----@param cb fun(i: integer, curr: any) i: the current loop consecutive number; curr: the current loop value taken from the array via the loop's consecutive number
+---@param array table<string, any>[]
+---@param focus table<string, any>
+---@param cb fun(i: integer, curr: any)? i: the current loop consecutive number; curr: the current loop value taken from the array via the loop's consecutive number
 hrlib.table.focusedArray = function(array, focus, cb)
-    if focus and type(focus) == 'table' and table.type(focus) == 'hash' then
+    if (type(array) == 'table' and table.type(array) == 'array') and focus and type(focus) == 'table' and table.type(focus) == 'hash' then
         local focusString
 
         for k,v in pairs(focus) do
@@ -85,32 +85,26 @@ end
 ---this function is about to match a value from array with the given value as any type or as array again
 ---@param tbl any[]|table the array to search in
 ---@param value any|any[]|table the value or other array to match the main array with
----@param returnIndex boolean? default: false
+---@param returnIndex boolean|boolean? default: false
 ---@param isValueKey boolean? it changes the function meaning at all with seeking key names match
----@return boolean, integer? tblIndex
+---@return boolean isFound, integer|integer[]? tblIndex
 hrlib.table.find = function(tbl, value, returnIndex, isValueKey)
+    local indexes <const> = {}
+
     if not isValueKey then
         for k,tableV in pairs(tbl) do
             if type(value) == 'table' then
                 if type(tableV) ~= 'table' then
                     for _,v in pairs(value) do
                         if tableV == v then
-                            if returnIndex then
-                                return true, k
-                            else
-                                return true
-                            end
+                            indexes[#indexes+1] = k
                         end
                     end
                 else
                     for _,v in pairs(value) do
                         for _,tblV in pairs(tableV) do
                             if tblV == v then
-                                if returnIndex then
-                                    return true, k
-                                else
-                                    return true
-                                end
+                                indexes[#indexes+1] = k
                             end
                         end
                     end
@@ -118,20 +112,12 @@ hrlib.table.find = function(tbl, value, returnIndex, isValueKey)
             else
                 if type(tableV) ~= 'table' then
                     if tableV == value then
-                        if returnIndex then
-                            return true, k
-                        else
-                            return true
-                        end
+                        indexes[#indexes+1] = k
                     end
                 else
                     for _,v in pairs(tableV) do
                         if v == value then
-                            if returnIndex then
-                                return true, k
-                            else
-                                return true
-                            end
+                            indexes[#indexes+1] = k
                         end
                     end
                 end
@@ -140,24 +126,32 @@ hrlib.table.find = function(tbl, value, returnIndex, isValueKey)
     else
         for k,v in pairs(tbl) do
             if k == value then
-                if returnIndex then
-                    return true, k
-                else
-                    return true
-                end
+                indexes[#indexes+1] = k
             end
 
             if type(v) == 'table' then
-                for vKey in pairs(v) do
-                    if vKey == value then
-                        if returnIndex then
-                            return true, k
-                        else
-                            return true
+                local valueCheck = function(self, subject)
+                    for vKey, vValue in pairs(subject) do
+                        if vKey == value then
+                            indexes[#indexes+1] = k
+
+                            return
+                        elseif vValue == 'table' then
+                            self(self, vValue)
                         end
                     end
                 end
+
+                valueCheck(valueCheck, v)
             end
+        end
+    end
+
+    if #indexes > 0 then
+        if returnIndex then
+            return true, #indexes == 1 and table.unpack(indexes) or indexes
+        else
+            return true
         end
     end
 
