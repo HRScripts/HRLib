@@ -95,15 +95,15 @@ hrlib.table.find = function(tbl, value, returnIndex, isValueKey)
         for k,tableV in pairs(tbl) do
             if type(value) == 'table' then
                 if type(tableV) ~= 'table' then
-                    for _,v in pairs(value) do
-                        if tableV == v then
+                    for valueK,v in pairs(value) do
+                        if valueK == k and tableV == v then
                             indexes[#indexes+1] = k
                         end
                     end
                 else
-                    for _,v in pairs(value) do
-                        for _,tblV in pairs(tableV) do
-                            if tblV == v then
+                    for valueK,v in pairs(value) do
+                        for tblK,tblV in pairs(tableV) do
+                            if valueK == tblK and tblV == v then
                                 indexes[#indexes+1] = k
                             end
                         end
