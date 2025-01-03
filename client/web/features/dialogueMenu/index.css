@@ -1,0 +1,182 @@
+@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap');
+
+body {
+    font-family: "Titillium Web", sans-serif;
+}
+
+.alertDialogue-menu {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #1e1e1e, #282828);
+    min-width: 20%;
+    max-width: 500px;
+    min-height: 15vh;
+    height: auto;
+    width: auto;
+    border-radius: 0.4vh;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.alertDialogue-title {
+    font-size: 1.8em;
+    padding: 1vh;
+    color: #ffffff;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.alertDialogue-description {
+    font-size: 1.2em;
+    overflow-wrap: break-word;
+    padding: 0.7vh;
+    color: #dddddd;
+    max-width: 90%;
+    margin-bottom: 20px;
+}
+
+.alertDialogue-buttons {
+    display: flex;
+    padding: 0.7vh;
+    justify-content: center;
+    gap: 15px;
+}
+
+.alertDialogue-button {
+    background: linear-gradient(135deg, #4a90e2, #1e90ff);
+    border: none;
+    border-radius: 0.4vh;
+    padding: 10px 20px;
+    font-size: 1em;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.alertDialogue-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.alertDialogue-button-cancel {
+    background: rgb(109, 109, 109);
+    border: none;
+    border-radius: 0.4vh;
+    padding: 10px 20px;
+    font-size: 1em;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.alertDialogue-button-cancel:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 768px) {
+    .alertDialogue-input {
+        width: 90%;
+        font-size: 0.9em;
+    }
+}
+
+/* input dialogue */
+
+.inputDialogue-menu {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    background: rgb(30, 30, 30);
+    width: 17%;
+    max-width: 500px;
+    min-height: 11vh;
+    height: auto;
+    padding: 20px;
+    border-radius: 0.4vh;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.input-title {
+    font-size: 1.5em;
+    color: #FFFFFF;
+    font-weight: bold;
+    position: relative;
+    top: -1vh;
+}
+
+.submit-button {
+    background: #4a90e2;
+    border: none;
+    border-radius: 0.3vh;
+    padding: 1vh 2vh;
+    font-size: 1em;
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.close-button {
+    background: rgb(109, 109, 109);
+    border: none;
+    border-radius: 0.3vh;
+    padding: 0.7vh 2vh;
+    font-size: 1em;
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.close-button:hover {
+    background: #727272;
+}
+
+.submit-button:hover {
+    background: #1e90ff;
+}
+
+.input input {
+    width: 80%;
+    padding: 0.7vh 1vh;
+    margin: 1vh 0;
+    font-size: 1em;
+    color: #ffffff;
+    background: rgba(30, 30, 30, 0.8);
+    border: 1px solid #1e90ff;
+    border-radius: 0.3vh;
+    outline: none;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.input {
+    color: #FFFFFF;
+    font-size: 1em;
+    margin-top: 1.5vh;
+}
+
+.input-description {
+    display: flex;
+    font-size: 1.15em;
+    color: #FFFFFF;
+    justify-content: left;
+    margin-bottom: 0vh;
+    margin-left: 2.5vh;
+}
+
+.inputDialogue-submitBtn {
+    display: flex;
+    margin-bottom: -1vh;
+    padding: 1vh;
+    margin-left: 1vh;
+    justify-content: end;
+    gap: 1vh;
+}

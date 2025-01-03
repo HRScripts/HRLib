@@ -1,4 +1,4 @@
-local interface <const> = {}
+local interface <const>, tableFunctions <const> = {}, load(LoadResourceFile('HRLib', 'client/modules/table.lua'), '@@HRLib/client/modules/table.lua')()
 local callbackStatus
 
 RegisterNUICallback('getTextUIStatus', function(data)
@@ -23,7 +23,7 @@ interface.isTextUIOpen = function(returnLastDescription)
 
     repeat Wait(10) until callbackStatus ~= nil
 
-    local cbStatus = callbackStatus
+    local cbStatus = type(callbackStatus) == 'table' and tableFunctions.table.deepclone(callbackStatus) or callbackStatus
     callbackStatus = nil
 
     if returnLastDescription then
@@ -52,6 +52,53 @@ interface.progressBar = function(type, options)
         content = options.description,
         position = options.position
     })
+end
+
+---@param options { title: string, description: string?, onAgree: function?, onCancel: function? }
+interface.createAlertDialogue = function(options)
+    if table.type(CurrentAlertDialogue) == 'empty' and table.type(CurrentInputDialogue) == 'empty' then
+        CurrentAlertDialogue = tableFunctions.table.deepclone(options)
+
+        options.onAgree = nil
+        options.onCancel = nil
+        options.action = 'alertDialogue' ---@diagnostic disable-line: inject-field
+        options.data = { ---@diagnostic disable-line: inject-field
+            title = options.title,
+            description = options.description
+        }
+
+        SendNUIMessage(options)
+        SetNuiFocus(true, true)
+    end
+end
+
+---@param options { title: string, questions: { type: 'text', options: HRLibInputDialogueTextOptions }[], onCancel: function? }
+---@return string[]?
+interface.createInputDialogue = function(options)
+    if table.type(CurrentAlertDialogue) == 'empty' and table.type(CurrentInputDialogue) == 'empty' then
+        CurrentInputDialogue = {
+            promise = promise.new(),
+            onCancel = options.onCancel
+        }
+
+        options.onCancel = nil
+        options = {
+            action = 'inputDialogue',
+            data = options
+        }
+
+        SendNUIMessage(options)
+        SetNuiFocus(true, true)
+        Citizen.Await(CurrentInputDialogue.promise)
+
+        local value <const> = CurrentInputDialogue.promise.value == 'table' and tableFunctions.table.deepclone(CurrentInputDialogue.promise.value) or CurrentInputDialogue.promise.value
+
+        CurrentInputDialogue = {}
+
+        if type(value) == 'table' and table.type(value) ~= 'empty' then
+            return value
+        end
+    end
 end
 
 return interface

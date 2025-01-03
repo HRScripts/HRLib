@@ -4,4 +4,14 @@ config.defaultWebHook = 'https://discord.com/api/webhooks/********************' 
 
 config.defaultNotificationsPosition = 'left-center' -- available positions - 'top-right', 'center-right', 'bottom-right', 'frombelow-right', 'top-left', 'left-center', 'frombelow-left'
 
+config.alertDialogueTranslation = {
+    agreeButton = 'Agree',
+    cancelButton = 'Cancel'
+}
+
+config.inputDialogueTranslation = {
+    confirmButton = 'Confirm',
+    cancelButton = 'Cancel'
+}
+
 return config --[[@as HRLibConfig]]

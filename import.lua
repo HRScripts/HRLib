@@ -6,6 +6,8 @@ hrlib.showTextUI = hrlibExport.showTextUI
 hrlib.isTextUIOpen = hrlibExport.isTextUIOpen
 hrlib.hideTextUI = hrlibExport.hideTextUI
 hrlib.progressBar = hrlibExport.progressBar
+hrlib.createAlertDialogue = hrlibExport.createAlertDialogue
+hrlib.createInputDialogue = hrlibExport.createInputDialogue
 
 ---@param name string the callback name
 ---@param isLocal boolean? By default it's false

@@ -1,6 +1,8 @@
 ---@class HRLibConfig
 ---@field defaultWebHook string
 ---@field defaultNotificationsPosition string
+---@field alertDialogueTranslation { agreeButton: string, cancelButton: string }
+---@field inputDialogueTranslation { confirmButton: string, cancelButton: string }
 
 ---@class HRLibClientFunctions
 ---@field DoesIdExist fun(playerId: integer?): boolean
@@ -41,6 +43,9 @@
 ---@field showTextUI fun(description: string)
 ---@field isTextUIOpen fun(returnLastDescription: boolean): boolean, string?
 ---@field hideTextUI function
+---@field progressBar fun(type: 'circle'|'horizontal'|'vertical', options: { duration: number, description: string?, position: 'center-left'|'center'|'center-right'|'bottom-left'|'bottom-center'|'bottom-right' })
+---@field createAlertDialogue fun(options: { title: string, description: string?, onAgree: function?, onCancel: function? })
+---@field createInputDialogue fun(options: { title: string, questions: { type: 'text', options: HRLibInputDialogueTextOptions }[], onCancel: function? }): string[]?
 
 ---@class HRLibServerFunctions
 ---@field DiscordMsg fun(webHook: string, botName: string, title: string, message: string, type: string?, color: integer, icon: string, author: string)
@@ -197,3 +202,7 @@
 ---@field getMoney fun(playerId: integer, account: 'cash'|'bank'): integer?
 ---@field setJob fun(playerId: integer, jobName: string, jobGrade: integer)
 ---@field setMoney fun(playerId: integer, account: 'cash'|'bank', amount: integer)
+
+---@class HRLibInputDialogueTextOptions
+---@field label string
+---@field placeholder string?

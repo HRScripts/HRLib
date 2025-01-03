@@ -1,5 +1,7 @@
+CurrentAlertDialogue, CurrentInputDialogue = {}, {}
 local resName <const> = GetCurrentResourceName()
 local hrlib <const>, clib <const>, _ <const> = load(LoadResourceFile('HRLib', 'client/modules/functions.lua'), '@@HRLib/client/modules/functions.lua')()
+local config <const> = hrlib.require(('@%s/config.lua'):format(resName))
 
 -- Events
 
@@ -79,6 +81,38 @@ end)
 
 RegisterNUICallback('getConfig', function(_, cb)
     cb(hrlib.require('@HRLib/config.lua'))
+end)
+
+RegisterNUICallback('getButtonsTranslation', function(data, cb)
+    cb({
+        confirmLabel = data.type == 'alert' and config.alertDialogueTranslation.agreeButton or config.inputDialogueTranslation.confirmButton,
+        cancelLabel = config[data.type == 'alert' and 'alertDialogueTranslation' or 'inputDialogueTranslation'].cancelButton
+    })
+end)
+
+RegisterNUICallback('closeDialogue', function(data)
+    SetNuiFocus(false, false)
+
+    if data.dialogueType == 'alert' then
+        local currentFunction <const> = CurrentAlertDialogue[data.type == 'cancel' and 'onCancel' or 'onAgree']
+        if type(currentFunction) == 'function' then
+            currentFunction()
+        end
+
+        CurrentAlertDialogue = {}
+    elseif data.dialogueType == 'input' then
+        if data.type == 'cancel' then
+            if type(CurrentInputDialogue.onCancel) == 'function' then
+                CurrentInputDialogue.onCancel()
+            end
+
+            CurrentInputDialogue.promise:resolve(false)
+
+            return
+        end
+
+        CurrentInputDialogue.promise:resolve(data.answers)
+    end
 end)
 
 -- Exports
