@@ -449,7 +449,7 @@ if GetCurrentResourceName() == 'HRLib' then
         if callback == nil then return end
 
         if type(callback) == 'function' or (type(callback) == 'table' and callback['__cfx_functionReference']) then
-            return callback(...)
+            return callback(false, ...)
         else
             return callback
         end

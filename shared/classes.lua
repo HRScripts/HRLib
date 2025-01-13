@@ -65,7 +65,7 @@
 ---@field string { split: fun(text: string, key: string, returnAllAs: 'string'|'number'?, isArray: boolean?): string[]|number[]|...?, gather: fun(text: string, key: string?): string? }
 ---@field table HRLibTableFunctions
 ---@field bridge HRLibServerBridge
----@field CreateCallback fun(name: string, isLocal: boolean?, cb: fun(...: ...?): ...|any) isLocal is not available in the export method!! In the export method, the parameters are name and cb
+---@field CreateCallback fun(name: string, isLocal: boolean?, cb: (fun(source: integer|false, ...: any): ...|any)) isLocal is not available in the export method!! In the export method, the parameters are name and cb
 ---@field Callback fun(name: string, ...: ...?): any? 
 ---@field ClientCallback fun(name: string, playerId: integer?, ...: ...?): any?
 ---@field StopMyself fun(msgtype: 'warn'|'error', msg: string)
