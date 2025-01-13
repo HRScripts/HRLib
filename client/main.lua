@@ -67,16 +67,6 @@ hrlib.CreateCallback('__HRLib:AllVehicleModels', true, function()
     return GetAllVehicleModels()
 end)
 
-hrlib.OnPlSpawn(function()
-    TriggerServerEvent('__HRLib:CommandsSuggestions')
-
-    for k,v in pairs(clib.RegisteredCmds) do
-        if type(v.suggestions) == 'table' and table.type(v.suggestions) ~= 'empty' then
-            TriggerEvent('chat:addSuggestion', ('/%s'):format(k), v.suggestions.help or '', v.suggestions.args or {})
-        end
-    end
-end)
-
 -- NUI Callbacks
 
 RegisterNUICallback('getConfig', function(_, cb)
@@ -113,6 +103,26 @@ RegisterNUICallback('closeDialogue', function(data)
 
         CurrentInputDialogue.promise:resolve(data.answers)
     end
+end)
+
+-- OnEvents
+
+hrlib.OnPlSpawn(function()
+    while IsScreenFadedOut() or not IsScreenFadedIn() do
+        Wait(70)
+    end
+
+    Wait(100)
+
+    TriggerServerEvent('__HRLib:CommandsSuggestions')
+
+    for k,v in pairs(clib.RegisteredCmds) do
+        if type(v.suggestions) == 'table' and table.type(v.suggestions) ~= 'empty' then
+            TriggerEvent('chat:addSuggestion', ('/%s'):format(k), v.suggestions.help or '', v.suggestions.args or {})
+        end
+    end
+
+    LocalPlayer.state:set('isPlayerSpawned', true, true)
 end)
 
 -- Exports
