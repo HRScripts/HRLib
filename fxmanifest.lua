@@ -6,7 +6,7 @@ name 'HRLib'
 author 'HRScripts Development'
 description 'A fivem library script used for all HRScripts Development\'s resources'
 repository 'https://github.com/HRScripts/HRLib'
-version '2.7.0'
+version '2.7.1'
 
 shared_scripts {
     'config.lua',
