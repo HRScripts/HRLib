@@ -19,7 +19,7 @@ function fplayer:newObject(id)
 end
 
 ---@param coords vector3
-function fplayer:teleport(coords)
+function fplayer:Teleport(coords)
     if type(coords) ~= 'vector3' then return end
 
     SetEntityCoordsNoOffset(GetPlayerPed(GetPlayerFromServerId(self.id)), coords) ---@diagnostic disable-line: missing-parameter, param-type-mismatch
@@ -30,7 +30,7 @@ if isServer then
     ---@param spawnPlayerInside boolean? spawn ped inside the vehicle
     ---@param saveVehicle boolean? save the old vehicle
     ---@return integer
-    function fplayer:spawnVehicle(vehModel, spawnPlayerInside, saveVehicle)
+    function fplayer:SpawnVehicle(vehModel, spawnPlayerInside, saveVehicle)
         local ped <const> = GetPlayerPed(self.id)
 
         if not saveVehicle then
@@ -52,7 +52,7 @@ if isServer then
     ---@param msg string content of the notice
     ---@param type string notice type ( success ; error ; info ; warning )
     ---@param time number time until notice closes (in miliseconds)
-    function fplayer:notify(msg, type, time)
+    function fplayer:Notify(msg, type, time)
         HRLib.Notify(self.id, msg, type, time)
     end
 
@@ -72,7 +72,7 @@ else
     ---@param spawnPlayerInside boolean?
     ---@param saveVehicle boolean?
     ---@return integer?
-    function fplayer:spawnVehicle(vehModel, spawnPlayerInside, saveVehicle)
+    function fplayer:SpawnVehicle(vehModel, spawnPlayerInside, saveVehicle)
         local model <const>, ped <const> = joaat(vehModel), GetPlayerPed(GetPlayerFromServerId(self.id))
 
         RequestModel(model)
@@ -100,7 +100,7 @@ else
 
     ---Freeze the current player
     ---@param toggle boolean? toggle the ped status
-    function fplayer:freeze(toggle)
+    function fplayer:Freeze(toggle)
         local ped <const> = GetPlayerPed(GetPlayerFromServerId(self.id))
         toggle = toggle or false
 
@@ -112,13 +112,13 @@ else
 end
 
 ---@param health number value of the player health
-function fplayer:setHealth(health)
+function fplayer:SetHealth(health)
     local ped <const> = GetPlayerPed(GetPlayerFromServerId(self.id))
     SetEntityHealth(ped, health or (IsPedMale(ped) and 200 or 100))
 end
 
 ---@param toggle boolean? toggle player invincible
-function fplayer:setInvincibility(toggle)
+function fplayer:SetInvincibility(toggle)
     SetPlayerInvincible(GetPlayerFromServerId(self.id), toggle or false)
 end
 
