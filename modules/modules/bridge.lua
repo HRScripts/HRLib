@@ -1,5 +1,3 @@
----@diagnostic disable: deprecated, duplicate-set-field
-
 local GetResourceState, serverSide <const> = GetResourceState, IsDuplicityVersion()
 local esxStatus, qbStatus = GetResourceState('es_extended'), GetResourceState('qb-core')
 

@@ -83,14 +83,14 @@ if IsDuplicityVersion() then
                     end
 
                     if not isPlayerAllowed or IsPlayerAceAllowed(source, 'command.'..name) == 1 then
-                        cb(args, rawCommand, HRLib.GetIPlayer(source) --[[@as HRLibServerIPlayer]], HRLib.GetFPlayer(source) --[[@as HRLibServerFPlayer]]) ---@diagnostic disable-line: deprecated
+                        cb(args, rawCommand, HRLib.GetIPlayer(source) --[[@as HRLibServerIPlayer]], HRLib.GetFPlayer(source) --[[@as HRLibServerFPlayer]])
                     end
                 elseif accessFromConsole and accessFromInGame then
                     if not isPlayerAllowed then
                         local IPlayer <const>, FPlayer <const> = HRLib.GetIPlayer(source) --[[@as HRLibServerIPlayer]] or {
                             id = source, playerId = source, source = source, Id = source, serverId = source,
                             name = 'TxAdmin Console'
-                        }, HRLib.GetFPlayer(source) --[[@as HRLibServerFPlayer]] or {} ---@diagnostic disable-line: deprecated
+                        }, HRLib.GetFPlayer(source) --[[@as HRLibServerFPlayer]] or {}
 
                         if table.type(FPlayer) == 'empty' then
                             function FPlayer:Notify(text, type)
@@ -112,7 +112,7 @@ if IsDuplicityVersion() then
                         cb(args, rawCommand, IPlayer, FPlayer)
                     elseif isPlayerAllowed and source ~= 0 then
                         if IsPlayerAceAllowed(source, 'command.'..name) == 1 then
-                            cb(args, rawCommand, HRLib.GetIPlayer(source) --[[@as HRLibServerIPlayer]], HRLib.GetFPlayer(source) --[[@as HRLibServerFPlayer]]) ---@diagnostic disable-line: deprecated
+                            cb(args, rawCommand, HRLib.GetIPlayer(source) --[[@as HRLibServerIPlayer]], HRLib.GetFPlayer(source) --[[@as HRLibServerFPlayer]])
                         end
                     elseif isPlayerAllowed and source == 0 then
                         local IPlayer <const>, FPlayer <const> = {

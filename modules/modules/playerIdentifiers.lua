@@ -33,7 +33,7 @@ HRLib.PlayerIdentifier = function(playerId, identifier, removeNames, isArray)
 
             if removeNames then
                 for i=0, GetNumPlayerIdentifiers(playerId)-1 do ---@diagnostic disable-line: param-type-mismatch
-                    local _ <const>, identity <const> = HRLib.string.split(GetPlayerIdentifier(playerId, i), ':') ---@diagnostic disable-line: deprecated, param-type-mismatch
+                    local _ <const>, identity <const> = HRLib.string.split(GetPlayerIdentifier(playerId, i), ':') ---@diagnostic disable-line: param-type-mismatch
 
                     identifiers[i == 0 and 1 or i+1] = identity
                 end
@@ -74,7 +74,7 @@ HRLib.PlayerIdentifierByIndex = function(playerId, identifier, removeNames, isAr
         for i=1, #identifier do
             if identifier[i] > 8 or type(identifier[i]) ~= 'number' then return end
 
-            identifiers[i] = GetPlayerIdentifier(tonumber(playerId), identifier[i]) ---@diagnostic disable-line: deprecated, param-type-mismatch
+            identifiers[i] = GetPlayerIdentifier(tonumber(playerId), identifier[i]) ---@diagnostic disable-line: param-type-mismatch
 
             if removeNames then
                 identifiers[i] = HRLib.string.split(identifiers[i], ':', 'string', true)
@@ -93,7 +93,7 @@ HRLib.PlayerIdentifierByIndex = function(playerId, identifier, removeNames, isAr
 
         if removeNames then
             for i=0, #plIdsCount do
-                local _ <const>, identity <const> = HRLib.string.split(GetPlayerIdentifier(playerId, i), ':') ---@diagnostic disable-line: deprecated, param-type-mismatch
+                local _ <const>, identity <const> = HRLib.string.split(GetPlayerIdentifier(playerId, i), ':') ---@diagnostic disable-line: param-type-mismatch
 
                 identifiers[i == 0 and 1 or i+1] = identity
             end

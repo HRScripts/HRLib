@@ -6,7 +6,7 @@ if IsDuplicityVersion() then
     ---@param playerId integer An existing player server Id
     ---@return HRLibServerIPlayer?
     HRLib.GetIPlayer = function(playerId)
-        if HRLib.DoesIdExist(playerId) then ---@diagnostic disable-line: deprecated
+        if HRLib.DoesIdExist(playerId) then
             local p <const> = GetPlayerPed(playerId)
             local veh <const> = GetVehiclePedIsIn(p, false)
             return {

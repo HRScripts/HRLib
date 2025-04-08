@@ -143,7 +143,7 @@ else
     RegisterNetEvent('HRLib:Notify', HRLib.Notify)
 
     RegisterNUICallback('getConfig', function(_, cb)
-        cb(HRLib.require('@HRLib/config.lua')) ---@diagnostic disable-line: deprecated
+        cb(HRLib.require('@HRLib/config.lua'))
     end)
 
     local config <const> = HRLib.require('@HRLib/config.lua')

@@ -89,7 +89,7 @@ end
 ---@param returnCloseIPlayers boolean?
 ---@return HRLibCloseIPlayer? closestIPlayer, HRLibCloseIPlayer[]? closeIPlayers
 HRLib.ClosestIPlayer = function(Id, returnCloseIPlayers)
-    local closestPed <const>, closePeds <const> = HRLib.ClosestPed(Id, true) ---@diagnostic disable-line: deprecated
+    local closestPed <const>, closePeds <const> = HRLib.ClosestPed(Id, true)
     if closestPed and closePeds then
         if IsPedAPlayer(closestPed.ped) then
             local closestIPlayer = {}
@@ -126,7 +126,7 @@ end
 ---@param returnCloseFPlayers boolean?
 ---@return HRLibCloseFPlayer? closestFPlayer, HRLibCloseFPlayer[]? closeFPlayers
 HRLib.ClosestFPlayer = function(Id, returnCloseFPlayers)
-    local closestPed <const>, closePeds <const> = HRLib.ClosestPed(Id, true) ---@diagnostic disable-line: deprecated
+    local closestPed <const>, closePeds <const> = HRLib.ClosestPed(Id, true)
     if closestPed and closePeds then
         if IsPedAPlayer(closestPed.ped) then
             local closestFPlayer = {}

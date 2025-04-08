@@ -5,7 +5,7 @@ local isServer <const> = IsDuplicityVersion()
 HRLib.require = function(path)
     if type(path) ~= 'string' or not string.find(path, '@') or not string.find(path, '/') then return end
 
-    local splittedPath <const> = HRLib.string.split(path, '/', 'string', true) --[[@as table[] ]] ---@diagnostic disable-line: deprecated
+    local splittedPath <const> = HRLib.string.split(path, '/', 'string', true) --[[@as string[] ]]
     local resourceName, filePath <const> = nil, path:sub(#splittedPath[1] + 2, #path)
 
     if splittedPath[1]:sub(1, 1) == '@' then
@@ -25,7 +25,7 @@ HRLib.require = function(path)
         return error(('The file %s does not exist in this resource (%s)!'):format(splittedPath[#splittedPath], resourceName), 2)
     end
 
-    local fileFormat <const> = HRLib.string.split(filePath, '.', nil, true)[2] ---@diagnostic disable-line: deprecated
+    local fileFormat <const> = HRLib.string.split(filePath, '.', nil, true)[2]
     if fileFormat == 'json' then
         return json.decode(file)
     elseif fileFormat == 'lua' then
