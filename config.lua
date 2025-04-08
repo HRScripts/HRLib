@@ -14,4 +14,4 @@ config.inputDialogueTranslation = {
     cancelButton = 'Cancel'
 }
 
-return config --[[@as HRLibConfig]]
+return config

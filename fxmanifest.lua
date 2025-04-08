@@ -4,25 +4,20 @@ lua54 'yes'
 
 name 'HRLib'
 author 'HRScripts Development'
-description 'A fivem library script used for all HRScripts Development\'s resources'
+description 'A fivem library script used for each HRScripts\' resource'
 repository 'https://github.com/HRScripts/HRLib'
-version '2.7.1'
+version '3.0.0'
 
-shared_scripts {
-    'config.lua',
-    'translator.lua',
-}
-
-client_script 'client/main.lua'
-
-server_script 'server/main.lua'
+shared_script 'main.lua'
 
 files {
+    'web/*.*',
+    'web/features/**/*.*',
+    'modules/*.*',
+    'modules/**/*.*',
+    'translator.lua',
     'config.lua',
-    'client/**/*.*',
-    'client/web/features/**/*.*',
-    'import.lua',
-    'translator.lua'
+    'import.lua'
 }
 
-ui_page 'client/web/index.html'
+ui_page 'web/index.html'

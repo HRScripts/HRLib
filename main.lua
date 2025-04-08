@@ -1,25 +1,11 @@
-local resName <const>, isServer <const>, load, LoadResourceFile = GetCurrentResourceName(), IsDuplicityVersion(), load, LoadResourceFile
+local resName <const> = GetCurrentResourceName()
 
 load(LoadResourceFile('HRLib', 'modules/import.lua'), '@@HRLib/modules/import.lua')()
 
-_ENV.HRLib = HRLib()
-
 local modules <const> = load(LoadResourceFile('HRLib', 'modules/modulesList.lua'), '@@HRLib/modules/modulesList.lua')()
 for i=1, #modules do
-    if modules[i] ~= 'interface' then
-        local path <const> = ('modules/modules/%s.lua'):format(modules[i])
-        load(LoadResourceFile('HRLib', path), ('@@HRLib/%s'):format(path))()
-    elseif not isServer then
-        local libFunctions <const> = exports.HRLib:getLibFunctions()
-        local interfaceModules <const> = isServer and { 'Notify' } or { 'showTextUI', 'isTextUIOpen', 'hideTextUI', 'progressBar', 'createAlertDialogue', 'createInputDialogue', 'Notify' }
-        for l=1, #interfaceModules do
-            HRLib[interfaceModules[l]] = libFunctions[interfaceModules[l]]
-        end
-    end
-end
-
-if not GetResourceMetadata(resName, 'remove_translator_import', 0) then
-    HRLib.require('@HRLib/translator.lua')
+    local path <const> = ('modules/modules/%s.lua'):format(modules[i])
+    load(LoadResourceFile('HRLib', path), ('@@HRLib/%s'):format(path))()
 end
 
 if IsDuplicityVersion() then
@@ -42,7 +28,7 @@ if IsDuplicityVersion() then
                                 if not latestVersion or latestVersion == currVersion then return end
 
                                 if tonumber(HRLib.string.gather(HRLib.string.split(latestVersion, '.', nil, true) --[[@as string[] ]], '')) > tonumber(HRLib.string.gather(HRLib.string.split(currVersion, '.', nil, true) --[[@as string[] ]], '')) then
-                                    print(('^3The resource %s is outdated. Current version: %s. Please update it! \nURL: %s^0'):format(resName, currVersion, body.html_url))
+                                    warn(('The resource %s is outdated. Please update it!\nCurrent version: %s. Latest version: %s\nURL: %s'):format(resName, currVersion, latestVersion, body.html_url))
                                 end
                             end
                         end)
@@ -51,4 +37,30 @@ if IsDuplicityVersion() then
             end
         end
     end
+
+    RegisterNetEvent('__HRLib:StopMyself', function(resourceName, msgtype, msg)
+        Wait(1000)
+
+        if msgtype == 'warn' or msgtype == 'error' and type(msg) == 'string' then
+            (msgtype == 'warn' and warn or error)(('%s: %s'):format(resourceName, msg))
+        end
+
+        StopResource(resourceName)
+    end)
+
+    AddEventHandler('onResourceStart', function(resource)
+        if resource == resName and resource ~= 'HRLib' then
+            warn(('^HRLib^3 is with different name (^1%s^3)! Please change this name because this will stop the working of all our resources!'):format(resName))
+        end
+    end)
+
+    AddEventHandler('onResourceStop', function(resource)
+        if resource == resName then
+            warn('The restarting/stopping of ^5hrlib^3 is not recommended! You may have error at our other scripts and the commands from the other resources will not be registered!')
+        end
+    end)
 end
+
+exports('getLibFunctions', function()
+    return HRLib(true)
+end)
