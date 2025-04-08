@@ -154,11 +154,11 @@ if IsDuplicityVersion() then
     RegisterNetEvent(('__%s:CommandsSuggestions'):format(resName), function()
         for k,v in pairs(HRLib.registeredCmds) do
             if type(v.suggestions) == 'table' and table.type(v.suggestions) ~= 'empty' then
-                if not v.isPlayerAllowed then
-                    TriggerClientEvent('chat:addSuggestion', source, '/'..k, v.suggestions.help or '', v.suggestions.args or {})
+                if not v.isPlayerAllowed and not v.suggestions.restricted then
+                    TriggerClientEvent('chat:addSuggestion', source, ('/%s'):format(k), v.suggestions.help or '', v.suggestions.args or {})
                 else
-                    if IsPlayerAceAllowed(source, k) then
-                        TriggerClientEvent('chat:addSuggestion', source, '/'..k, v.suggestions.help or '', v.suggestions.args or {})
+                    if IsPlayerAceAllowed(source, ('command.%s'):format(k)) then
+                        TriggerClientEvent('chat:addSuggestion', source, ('/%s'):format(k), v.suggestions.help or '', v.suggestions.args or {})
                     end
                 end
             end
@@ -198,18 +198,18 @@ else
         end, false)
     end
 
-    AddEventHandler('playerSpawned', function(resource)
-        if resource == resName then
+    AddEventHandler('playerSpawned', function()
+        if NetworkIsPlayerActive(PlayerId()) or IsScreenFadedOut() then
             while not NetworkIsPlayerActive(PlayerId()) or IsScreenFadedOut() do
                 Wait(100)
             end
+        end
 
-            TriggerServerEvent(('__%s:CommandsSuggestions'):format(resName))
+        TriggerServerEvent(('__%s:CommandsSuggestions'):format(resName))
 
-            for k,v in pairs(HRLib.registeredCmds) do
-                if type(v.suggestions) == 'table' and table.type(v.suggestions) ~= 'empty' then
-                    TriggerEvent('chat:addSuggestion', ('/%s'):format(k), v.suggestions.help or '', v.suggestions.args or {})
-                end
+        for k,v in pairs(HRLib.registeredCmds) do
+            if type(v.suggestions) == 'table' and table.type(v.suggestions) ~= 'empty' then
+                TriggerEvent('chat:addSuggestion', ('/%s'):format(k), v.suggestions.help or '', v.suggestions.args or {})
             end
         end
     end)
