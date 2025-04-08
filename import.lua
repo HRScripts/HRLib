@@ -42,7 +42,7 @@ if IsDuplicityVersion() then
                                 if not latestVersion or latestVersion == currVersion then return end
 
                                 if tonumber(HRLib.string.gather(HRLib.string.split(latestVersion, '.', nil, true) --[[@as string[] ]], '')) > tonumber(HRLib.string.gather(HRLib.string.split(currVersion, '.', nil, true) --[[@as string[] ]], '')) then
-                                    print(('^3The resource %s is outdated. Current version: %s. Please update it! \nURL: %s^0'):format(resName, currVersion, body.html_url))
+                                    warn(('The resource %s is outdated. Please update it!\nCurrent version: %s. Latest version: %s\nURL: %s'):format(resName, currVersion, latestVersion, body.html_url))
                                 end
                             end
                         end)
