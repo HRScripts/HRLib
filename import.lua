@@ -9,7 +9,7 @@ for i=1, #modules do
     if modules[i] ~= 'interface' then
         local path <const> = ('modules/modules/%s.lua'):format(modules[i])
         load(LoadResourceFile('HRLib', path), ('@@HRLib/%s'):format(path))()
-    elseif not isServer then
+    else
         local libFunctions <const> = exports.HRLib:getLibFunctions()
         local interfaceModules <const> = isServer and { 'Notify' } or { 'showTextUI', 'isTextUIOpen', 'hideTextUI', 'progressBar', 'createAlertDialogue', 'createInputDialogue', 'Notify' }
         for l=1, #interfaceModules do
