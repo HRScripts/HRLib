@@ -54,20 +54,13 @@ if isServer then
 
         local callback
 
-        if resName ~= 'HRLib' then
-            TriggerClientEvent(('__%s:SendCallback'):format(resName), HRLib.DoesIdExist(playerId --[[@as integer]]) and playerId or -1, name, ...)
-            Citizen.Await(HRLib.callbacksPromises[name])
+        TriggerClientEvent(('__%s:SendCallback'):format(resName), HRLib.DoesIdExist(playerId --[[@as integer]]) and playerId or -1, name, ...)
+        Citizen.Await(HRLib.callbacksPromises[name])
 
-            callback = HRLib.clientCallbacks[name]
+        callback = HRLib.clientCallbacks[name]
 
-            if callback == nil then
-                TriggerClientEvent('__HRLib:TransferCallback', HRLib.DoesIdExist(playerId --[[@as integer]]) and playerId or -1, resName, 'server', name, ...)
-                Citizen.Await(HRLib.callbacksPromises[name])
-
-                callback = HRLib.clientCallbacks[name]
-            end
-        else
-            TriggerClientEvent('__HRLib:SendCallback', HRLib.DoesIdExist(playerId --[[@as integer]]) and playerId or -1, name, ...)
+        if callback == nil and resName ~= 'HRLib' then
+            TriggerClientEvent('__HRLib:TransferCallback', HRLib.DoesIdExist(playerId --[[@as integer]]) and playerId or -1, resName, 'server', name, ...)
             Citizen.Await(HRLib.callbacksPromises[name])
 
             callback = HRLib.clientCallbacks[name]
@@ -178,7 +171,7 @@ RegisterNetEvent(('__%s:SendCallback'):format(resName), function(name, ...)
     if isServer then
         TriggerClientEvent(evName, source, table.unpack(params))
     else
-        TriggerEvent(evName, table.unpack(params))
+        TriggerServerEvent(evName, table.unpack(params))
     end
 end)
 
