@@ -146,7 +146,6 @@ else
         cb(HRLib.require('@HRLib/config.lua'))
     end)
 
-    local config <const> = HRLib.require('@HRLib/config.lua')
     RegisterNUICallback('getButtonsTranslation', function(data, cb)
         cb({
             confirmLabel = data.type == 'alert' and config.alertDialogueTranslation.agreeButton or config.inputDialogueTranslation.confirmButton,
