@@ -17,8 +17,10 @@ HRLib.PlayerIdentifier = function(playerId, identifier, removeNames, isArray)
                 if string.find('steam license license2 discord xbl ip live fivem', identifier[i], nil, true) then
                     identifiers[i] = pli(tonumber(playerId) --[[@as integer]], identifier[i])
 
-                    if removeNames then
-                        identifiers[i] = HRLib.string.split(identifiers[i], ':', 'string', true)[2]
+                    if identifiers[i] then
+                        if removeNames then
+                            identifiers[i] = HRLib.string.split(identifiers[i], ':', 'string', true)[2]
+                        end
                     end
                 end
             end
@@ -39,7 +41,7 @@ HRLib.PlayerIdentifier = function(playerId, identifier, removeNames, isArray)
                 end
             else
                 for i=0, GetNumPlayerIdentifiers(playerId)-1 do ---@diagnostic disable-line: param-type-mismatch
-                    identifiers[i == 0 and 1 or i+1] = GetPlayerIdentifier(playerId, i) ---@diagnostic disable-line: param-type-mismatch
+                    identifiers[#identifiers+1] = GetPlayerIdentifier(playerId, i) ---@diagnostic disable-line: param-type-mismatch
                 end
             end
 
@@ -50,12 +52,13 @@ HRLib.PlayerIdentifier = function(playerId, identifier, removeNames, isArray)
             end
         else
             local currIdentity = pli(tonumber(playerId) --[[@as integer]], identifier)
+            if currIdentity then
+                if removeNames then
+                    currIdentity = HRLib.string.split(currIdentity, ':', 'string', true)[2] --[[@as string]]
+                end
 
-            if removeNames then
-                currIdentity = HRLib.string.split(currIdentity, ':', 'string', true)[2] --[[@as string]]
+                return isArray and { currIdentity } or currIdentity
             end
-
-            return isArray and { currIdentity } or currIdentity
         end
     end
 end
@@ -76,8 +79,10 @@ HRLib.PlayerIdentifierByIndex = function(playerId, identifier, removeNames, isAr
 
             identifiers[i] = GetPlayerIdentifier(tonumber(playerId), identifier[i]) ---@diagnostic disable-line: param-type-mismatch
 
-            if removeNames then
-                identifiers[i] = HRLib.string.split(identifiers[i], ':', 'string', true)
+            if identifiers[i] then
+                if removeNames then
+                    identifiers[i] = HRLib.string.split(identifiers[i], ':', 'string', true)
+                end
             end
         end
 
@@ -95,11 +100,11 @@ HRLib.PlayerIdentifierByIndex = function(playerId, identifier, removeNames, isAr
             for i=0, #plIdsCount do
                 local _ <const>, identity <const> = HRLib.string.split(GetPlayerIdentifier(playerId, i), ':') ---@diagnostic disable-line: param-type-mismatch
 
-                identifiers[i == 0 and 1 or i+1] = identity
+                identifiers[i+1] = identity
             end
         else
             for i=0, #plIdsCount do
-                identifiers[i == 0 and 1 or i+1] = GetPlayerIdentifier(tostring(playerId), i)
+                identifiers[i+1] = GetPlayerIdentifier(tostring(playerId), i)
             end
         end
 
