@@ -54,7 +54,7 @@ window.addEventListener('message', function(event) {
             .appendTo('.notifications');
 
         if (event.data.sound) {
-            const sound = new Audio('sound.wav');
+            const sound = new Audio('nui://HRLib/web/features/notify/sound.wav');
             sound.volume = 0.2;
 
             sound.play()
