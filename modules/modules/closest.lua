@@ -1,10 +1,10 @@
 if IsDuplicityVersion() then return end
 
----@param Id integer? An existing player server Id or nil for the current player server Id or the ped
+---Function to get the closest ped to the player
 ---@param returnClosePeds boolean? returns the peds found in this radius
 ---@return { ped: integer, distance: number }? closestPed, { ped: integer, distance: number }[]? closePeds
-HRLib.ClosestPed = function(Id, returnClosePeds)
-    local ped <const> = type(Id) == 'number' and GetPlayerPed(GetPlayerFromServerId(Id)) or type(Id) == 'nil' and PlayerPedId() or Id --[[@as integer]]
+HRLib.ClosestPed = function(returnClosePeds)
+    local ped <const> = PlayerPedId()
     local pedCoords <const> = GetEntityCoords(ped)
     local closestPed
 
@@ -31,11 +31,11 @@ HRLib.ClosestPed = function(Id, returnClosePeds)
     return closestPed
 end
 
----@param Id integer? existing player server Id or nil for the current player server Id
+---Function to get the closest vehicle to the player
 ---@param returnCloseVehs boolean?
----@return { vehicle: integer, distance: number }? closestVehicle, { vehicle: integer, distance: number }[]? closeVehs
-HRLib.ClosestVehicle = function(Id, returnCloseVehs)
-    local ped <const>, vehs <const> = Id and GetPlayerPed(GetPlayerFromServerId(Id)) or PlayerPedId(), GetGamePool('CVehicle')
+---@return { vehicle: integer, distance: number }? closestVehicle, { vehicle: integer, distance: number }[]? closeVehicles
+HRLib.ClosestVehicle = function(returnCloseVehs)
+    local ped <const>, vehs <const> = PlayerPedId(), GetGamePool('CVehicle')
     local closestVehicle
 
     for i=1, #vehs do
@@ -58,11 +58,11 @@ HRLib.ClosestVehicle = function(Id, returnCloseVehs)
     return closestVehicle
 end
 
----@param Id integer? existing player server Id or nil for the current player server Id
+---Function to get the closest object to the player
 ---@param returnCloseObjects boolean?
 ---@return { entity: integer, distance: number }? closestObject, { entity: integer, distance: number }[]? closeObjects
-HRLib.ClosestObject = function(Id, returnCloseObjects)
-    local objects <const>, playerCoords <const> = GetGamePool('CObject'), Id and GetEntityCoords(GetPlayerPed(GetPlayerFromServerId(Id)) or GetEntityCoords(PlayerPedId())) or GetEntityCoords(PlayerPedId())
+HRLib.ClosestObject = function(returnCloseObjects)
+    local objects <const>, playerCoords <const> = GetGamePool('CObject'), GetEntityCoords(PlayerPedId())
     local closestObject
 
     for i=1, #objects do
@@ -85,11 +85,11 @@ HRLib.ClosestObject = function(Id, returnCloseObjects)
     return closestObject
 end
 
----@param Id integer? An existing player server Id or nil for the current player server Id
+---Function to get the closest IPlayer to the player
 ---@param returnCloseIPlayers boolean?
 ---@return HRLibCloseIPlayer? closestIPlayer, HRLibCloseIPlayer[]? closeIPlayers
-HRLib.ClosestIPlayer = function(Id, returnCloseIPlayers)
-    local closestPed <const>, closePeds <const> = HRLib.ClosestPed(Id, true)
+HRLib.ClosestIPlayer = function(returnCloseIPlayers)
+    local closestPed <const>, closePeds <const> = HRLib.ClosestPed(true)
     if closestPed and closePeds then
         if IsPedAPlayer(closestPed.ped) then
             local closestIPlayer = {}
@@ -117,43 +117,6 @@ HRLib.ClosestIPlayer = function(Id, returnCloseIPlayers)
                 return closestIPlayer, closeIPlayers
             else
                 return closestIPlayer
-            end
-        end
-    end
-end
-
----@param Id integer? An existing player server Id or nil for the current player server Id
----@param returnCloseFPlayers boolean?
----@return HRLibCloseFPlayer? closestFPlayer, HRLibCloseFPlayer[]? closeFPlayers
-HRLib.ClosestFPlayer = function(Id, returnCloseFPlayers)
-    local closestPed <const>, closePeds <const> = HRLib.ClosestPed(Id, true)
-    if closestPed and closePeds then
-        if IsPedAPlayer(closestPed.ped) then
-            local closestFPlayer = {}
-
-            if IsPedAPlayer(closestPed.ped) then
-                closestFPlayer = HRLib.GetFPlayer(GetPlayerServerId(NetworkGetPlayerIndexFromPed(closestPed.ped))) --[[@as HRLibCloseFPlayer]]
-                closestFPlayer.distance = closestPed.distance
-            end
-
-            if returnCloseFPlayers then
-                local closeFPlayers <const> = {}
-
-                for i=1, #closePeds do
-                    local curr <const> = closePeds[i]
-                    if IsPedAPlayer(curr.ped) then
-                        if table.type(closestFPlayer) == 'empty' then
-                            closestFPlayer = HRLib.GetFPlayer(GetPlayerServerId(NetworkGetPlayerIndexFromPed(curr.ped))) --[[@as HRLibCloseFPlayer]]
-                            closestFPlayer.distance = curr.distance
-                        else
-                            closeFPlayers[#closeFPlayers+1] = HRLib.GetFPlayer(GetPlayerServerId(NetworkGetPlayerIndexFromPed(curr.ped)))
-                        end
-                    end
-                end
-
-                return closestFPlayer, closeFPlayers
-            else
-                return closestFPlayer
             end
         end
     end
