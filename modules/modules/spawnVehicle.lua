@@ -2,7 +2,7 @@ local isServer <const> = IsDuplicityVersion()
 
 ---@param vehModel string|integer existing vehicle model or model hash
 ---@param coords vector4 vehicle spawn coordinates
----@return integer? vehicleModel
+---@return integer? vehicle
 HRLib.SpawnVehicle = function(vehModel, coords)
     local modelHash <const> = type(vehModel) == 'number' and vehModel or joaat(vehModel)
 
