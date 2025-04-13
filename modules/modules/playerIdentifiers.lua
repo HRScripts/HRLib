@@ -1,3 +1,5 @@
+if not IsDuplicityVersion() then return end
+
 ---@type fun(playerSrc: integer, identifierType: string): string
 local pli = GetPlayerIdentifierByType
 
@@ -5,7 +7,7 @@ local pli = GetPlayerIdentifierByType
 ---@param identifier string|'all'|string[] identifier type. Identifier types: steam ; license ; licens2 ; fivem ; discord ; xbl ; live ; ip . It's a table when you want to get multiple of identifiers. Example: HRLib.PlayerIdentifier(playerId, { 'steam', 'license', 'discord' }). You can also set the `identifier` param to ` 'all' ` to get every identifier
 ---@param removeNames boolean? remove the name(s) of the identifier(s)
 ---@param isArray boolean? return the IDs as array or not
----@return ...|string?
+---@return ...|string|string[]?
 HRLib.PlayerIdentifier = function(playerId, identifier, removeNames, isArray)
     if HRLib.DoesIdExist(playerId) or GetPlayerIdentifierByType(tostring(playerId), 'license') ~= nil then
         if type(identifier) == 'table' then
@@ -67,7 +69,7 @@ end
 ---@param identifier integer|'all'|integer[] identifier index ( 0-7 ). It's a table when you want to get multiple of identifiers. Example: HRLib.PlayerIdentifier(playerId, { 'steam', 'license', 'discord' }); You can also add
 ---@param removeNames boolean? remove the name(s) of the identifier(s)
 ---@param isArray boolean? return the IDs as array or not
----@return ...|string?
+---@return ...|string|string[]?
 HRLib.PlayerIdentifierByIndex = function(playerId, identifier, removeNames, isArray)
     if type(identifier) == 'table' then
         if playerId == nil or identifier == nil or playerId == '' or #identifier > 8 then return end
@@ -132,7 +134,7 @@ HRLib.PlayerIdentifierByIndex = function(playerId, identifier, removeNames, isAr
 end
 
 ---@param identifier string
----@return integer?
+---@return integer? playerId
 HRLib.PlayerServerIdByIdentifier = function(identifier)
     local idType <const> = type(identifier) == 'string' and HRLib.string.split(identifier, ':', nil, true)?[1] --[[@as string]]
 
