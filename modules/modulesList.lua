@@ -2,7 +2,7 @@ return {
     'string',
     'table',
     'resources',
-    'blip',
+    'createBlip',
     'bridge',
     'callbacks',
     'closest',
