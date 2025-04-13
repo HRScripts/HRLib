@@ -1,16 +1,17 @@
+local eventName <const> = ('__%s:allPlayers'):format(GetCurrentResourceName())
 if IsDuplicityVersion() then
-    HRLib.CreateCallback(('__%s:allPlayers'):format(GetCurrentResourceName()), true, function()
+    HRLib.CreateCallback(eventName, true, function()
         return GetPlayers()
     end)
 else
-    ---@return integer[]
+    ---@return integer[]?
     HRLib.GetPlayers = function()
-        local players <const> = HRLib.ServerCallback(('__%s:allPlayers'):format(GetCurrentResourceName()))
+        local players <const> = HRLib.ServerCallback(eventName)
 
         for i=1, #players do
             players[i] = tonumber(players[i]) --[[@as integer]]
         end
 
-        return players
+        return #players > 0 and players or nil
     end
 end

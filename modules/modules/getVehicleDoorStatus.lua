@@ -1,8 +1,8 @@
 if IsDuplicityVersion() then return end
 
----Get the status of all doors of a vehicle
+---Get the status for each door of the given vehicle
 ---@param vehicle integer
----@return boolean[]|{} statusList true for each value means the door's closed and false for each value means the door's openned
+---@return boolean[]? statusList true for each value means the door's closed and false for each value means the door's opened
 HRLib.GetVehicleDoorStatus = function(vehicle)
     local doorsStatus <const> = {}
 
@@ -10,5 +10,5 @@ HRLib.GetVehicleDoorStatus = function(vehicle)
         doorsStatus[#doorsStatus+1] = GetVehicleDoorAngleRatio(vehicle, i) == 0
     end
 
-    return doorsStatus
+    return #doorsStatus > 0 and doorsStatus or nil
 end

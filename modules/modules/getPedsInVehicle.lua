@@ -1,7 +1,7 @@
 if IsDuplicityVersion() then return end
 
 ---@param vehicle integer
----@return integer[]|{}?
+---@return integer[]?
 HRLib.GetPedsInVehicle = function(vehicle)
     if DoesEntityExist(vehicle) then
         local seatsCount <const> = GetVehicleModelNumberOfSeats(GetEntityModel(vehicle))
@@ -14,6 +14,6 @@ HRLib.GetPedsInVehicle = function(vehicle)
             end
         end
 
-        return peds
+        return #peds > 0 and peds or nil
     end
 end

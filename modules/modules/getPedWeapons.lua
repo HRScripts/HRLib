@@ -1,6 +1,6 @@
 if IsDuplicityVersion() then return end
 
----@return string[]
+---@return string[]?
 HRLib.GetPedWeapons = function()
     local pedWeapons <const> = {}
 
@@ -11,5 +11,5 @@ HRLib.GetPedWeapons = function()
         end
     end
 
-    return pedWeapons
+    return #pedWeapons > 0 and pedWeapons or nil
 end

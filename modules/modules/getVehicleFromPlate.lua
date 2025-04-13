@@ -1,7 +1,9 @@
+local isServer <const> = IsDuplicityVersion()
+
 ---@param plate string<8>
 ---@return integer|integer[]? entityId
 HRLib.GetVehicleFromPlate = function(plate)
-    local vehicles <const> = IsDuplicityVersion() and GetAllVehicles() or GetGamePool('CVehicle')
+    local vehicles <const> = isServer and GetAllVehicles() or GetGamePool('CVehicle')
     local focusedVehicles <const> = {}
 
     for i=1, #vehicles do
