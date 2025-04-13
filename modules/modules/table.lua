@@ -197,22 +197,51 @@ end
 ---Returns if tbl1 equals by values or table id to tbl2
 ---@param tbl1 table
 ---@param tbl2 table
+---@param noKeyCompare boolean? sets whether or not the function should compare the values by their keys or compare only values
 ---@return boolean
-HRLib.table.compare = function(tbl1, tbl2)
+HRLib.table.compare = function(tbl1, tbl2, noKeyCompare)
     if tbl1 == tbl2 then return true end
     if type(tbl1) ~= 'table' or type(tbl2) ~= 'table' or table.type(tbl1) == 'empty' and table.type(tbl2) ~= 'empty' or table.type(tbl1) ~= 'empty' and table.type(tbl2) == 'empty' then return false end
 
     for k,v in pairs(tbl1) do
-        if HRLib.table.find(tbl2, k, false, true) then
-            if type(tbl2[k]) == 'table' and not HRLib.table.compare(v, tbl2[k]) then
-                return false
-            elseif type(tbl2[k]) ~= 'table' and tbl2[k] ~= v then
+        if noKeyCompare then
+            if not HRLib.table.find(tbl2, v) then
                 return false
             end
         else
-            return false
+            if HRLib.table.find(tbl2, k, false, true) then
+                if type(tbl2[k]) == 'table' and not HRLib.table.compare(v, tbl2[k]) then
+                    return false
+                elseif type(tbl2[k]) ~= 'table' and tbl2[k] ~= v then
+                    return false
+                end
+            else
+                return false
+            end
         end
     end
 
     return true
+end
+
+---Returns all keys of the given table
+---@param tbl table
+---@param isArray boolean? default is false
+---@return ...|string[]?
+HRLib.table.getKeys = function(tbl, isArray)
+    if type(tbl) ~= 'table' or table.type(tbl) == 'empty' then return end
+
+    local keys <const> = {}
+
+    for k,_ in pairs(tbl) do
+        keys[#keys+1] = k
+    end
+
+    if #keys > 0 then
+        if isArray then
+            return keys
+        else
+            return table.unpack(keys)
+        end
+    end
 end
