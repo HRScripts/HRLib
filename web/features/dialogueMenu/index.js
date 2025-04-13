@@ -56,10 +56,12 @@ window.addEventListener('message', (event) => {
                 });
             });
 
-            data.questions.forEach(function(value) {
-                const currQuestion = $(`<div class="input"><p class="input-description">${value.label}</p><input type="text" placeholder="${value.placeholder || ''}"></div>`);
-                $('.inputs').append(currQuestion);
-            });
+            if (Array.isArray(data.questions)) {
+                data.questions.forEach(function(value) {
+                    const currQuestion = $(`<div class="input"><p class="input-description">${value.options.label}</p><input type="text" placeholder="${value.options.placeholder || ''}"></div>`);
+                    $('.inputs').append(currQuestion);
+                });
+            };
 
             break;
         default:
