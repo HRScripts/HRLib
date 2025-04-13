@@ -159,6 +159,7 @@ HRLib.table.find = function(tbl, value, returnIndex, isValueKey, returnUnderInde
 end
 
 ---@param tbl table
+---@return table
 HRLib.table.deepclone = function(tbl)
     local table = {}
 
@@ -205,7 +206,13 @@ HRLib.table.compare = function(tbl1, tbl2, noKeyCompare)
 
     for k,v in pairs(tbl1) do
         if noKeyCompare then
-            if not HRLib.table.find(tbl2, v) then
+            if type(v) == 'table' and type(tbl2[k]) == 'table' then
+                if not HRLib.table.compare(v, tbl2[k], noKeyCompare) then
+                    return false
+                end
+            elseif type(v) == 'table' and type(tbl2[k]) ~= 'table' or type(v) ~= 'table' and type(tbl2[k]) == 'table' then
+                return false
+            elseif not HRLib.table.find(tbl2, v) then
                 return false
             end
         else
