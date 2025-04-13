@@ -1,6 +1,7 @@
 ---@class HRLibConfig
 ---@field defaultWebHook string
 ---@field defaultNotificationsPosition string
+---@field defaultProgressBarPosition string
 ---@field alertDialogueTranslation { agreeButton: string, cancelButton: string }
 ---@field inputDialogueTranslation { confirmButton: string, cancelButton: string }
 
@@ -8,12 +9,16 @@
 ---@field Teleport fun(self: HRLibClientFPlayer, coords: vector3)
 ---@field SpawnVehicle fun(self: HRLibClientFPlayer, vehModel: string|integer, spawnPedInside: boolean?, saveVehicle: boolean?): integer?
 ---@field Freeze fun(self: HRLibClientFPlayer, toggle: boolean)
+---@field SetHealth fun(self: HRLibClientFPlayer, health: integer?)
+---@field SetInvincibility fun(self: HRLibClientFPlayer, toggle: boolean?)
 
 ---@class HRLibServerFPlayer
 ---@field Teleport fun(self: HRLibServerFPlayer, coords: vector3)
 ---@field SpawnVehicle fun(self: HRLibServerFPlayer, vehModel: string|integer, spawnPlayerInside: boolean?, saveVehicle: boolean?): integer?
 ---@field Notify fun(self: HRLibServerFPlayer, description: string?, type: 'success'|'info'|'error'|'warning'?, duration: number?, pos: 'top-right'|'center-right'|'bottom-right'|'frombelow-right'|'top-left'|'left-center'|'frombelow-left'?, sound: boolean?)
 ---@field FocusedEvent fun(self: HRLibServerFPlayer, eventName: string, ...: any)
+---@field SetHealth fun(self: HRLibServerFPlayer, health: integer?)
+---@field SetInvincibility fun(self: HRLibServerFPlayer, toggle: boolean?)
 
 ---@class HRLibClientIPlayer
 ---@field source integer
@@ -27,24 +32,13 @@
 ---@field serverPlId integer
 ---@field sPlId integer
 ---@field state table?
----@field invincible_2 boolean
 ---@field max { stamina: number, armour: integer, health: integer }
----@field currStamina number
----@field veh { dmgModifier: number, defModifier: number }
----@field weapon { dmgModifier: number, defModifier: number, defModifier_2: number, malee: { dmgModifier: number, defModifier: number } }
 ---@field coords vector3
+---@field coordinates vector3
 ---@field heading number
----@field currStealthNoise number
----@field group integer
----@field invincible boolean
 ---@field name string
 ---@field ped integer
----@field pedIsFollowing integer
----@field rgbColor integer
----@field team integer
----@field underWaterTimeRmng number
----@field entity { targetEntity: { [1]: boolean, [2]: integer }, health: number, archeTypeName: string, attachedTo: integer, model: integer, mapDataOwner: { [1]: boolean, [2]: integer, [3]: integer }, alpha: integer, forward: { vector: vector3, x: number, y: number }, heightAboveGround: number, lodDist: integer, matrix: vector3[], pitch: number, populationType: integer, quaternion: number[], roll: number, rotationVelocity: vector3, speed: number, submergedLvl: number, type: number, uprightValue: number, velocity: vector3, lastHitMaterial: integer, nearestPl: integer, objectIndex: integer, vehIndex: integer, hasLoadedCollisionAround: boolean, hasBeenDamagedByAnyObject: boolean, hasBeenDamagedByAnyVeh: boolean, hasCollidedWithAnything: boolean, isAttached: boolean, isAttachedToAnyObject: boolean, isAttachedToAnyPed: boolean, isAttachedToAnyVeh: boolean, isDead: boolean, isInAir: boolean, isInWater: boolean, isOccluded: boolean, isOnScreen: boolean, isStatic: boolean, isUpsideDown: boolean, isVisible: boolean, isVisibleToScript: boolean, isWaitingForWorldCollision: boolean, isFreezed: boolean }
----@field streetName string
+---@field entity { archetypeName: string, model: integer, mapdataOwner: { [1]: boolean, [2]: integer, [3]: integer }, populationType: number, type: integer }
 
 ---@class HRLibServerIPlayer
 ---@field source integer
@@ -65,22 +59,10 @@
 ---@field max { health: integer, armour: integer }
 ---@field ped integer
 ---@field tokens { t1: string, t2: string, t3: string, t4: string, allString: string, num: integer }
----@field camRotation vector3
----@field endPoint string
----@field fakeWantedLvl integer
----@field guid string
----@field invincible boolean
----@field lastMsg integer
----@field rountingBucket integer
----@field team integer
----@field wanted { centrePos: vector3, lvl: integer }
----@field weapon { dmgModifier: number, defModifier: number, defModifier_2: number, maleeWeaponDmgModifier: number }
 ---@field coords vector3
 ---@field heading number
 ---@field health integer
----@field entity { attachedTo: integer, isFreezed: boolean, model: integer, populationType: integer, rotation: vector3, rotationVelocity: vector3, rountingBucket: integer, script: string, speed: number, type: integer, velocity: vector3, sourceOfDamage: integer, sourceOfDeath: integer, isVisible: boolean, netId: integer }
----@field veh { bodyHealth: number, colours: integer[], custom: { primaryColour: integer[], secondaryColour: integer[] }, dashboardColour: integer, dirtLevel: number, doorLockStatus: number, doorStatus: integer, doorsLockedForPlayer: integer, engineHealth: number, extraColours: integer[], flightNozzlePosition: number, handbrake: boolean, headlightsColour: integer, homingLockonState: integer, interiorColour: integer, lightsState: boolean[], livery: integer, lockOnTarget: { [1]: boolean, [2]: integer }, plate: string, plateIndex: integer, petrolTankHealth: number, radioStationIndex: integer, roofLivery: integer, steeringAngle: number, type: string, tyreSmokeColour: integer[], wheelType: integer, windowTint: integer }
----@field vehicle integer
+---@field entity { isFreezed: boolean, model: integer, populationType: integer, type: integer, isVisible: boolean, netId: integer }
 
 ---@class HRLibCloseIPlayer : HRLibClientIPlayer
 ---@field distance number
@@ -112,20 +94,6 @@
 
 ---@class HRLibBlipForPickupOptions
 ---@field pickup integer
-
----@class HRLibTableFunctions
----@field focusedArray fun(array: table[], focus: table, cb: fun(i: integer, curr: table))
----@field focusedHash fun(hash: table, focus: table|any, cb: fun(key: string, value: any[], arrayInfo: { i: integer, curr: table }))
----@field getHashLength fun(hash: table): integer
----@field find fun(tbl: any[], value: any|any[], returnIndex: boolean?, isValueKey: boolean?): boolean
----@field deepclone fun(tbl: table): table
-
----@class HRLibServerBridge
----@field getName fun(playerId: integer, nameType: 'firstname'|'lastname'?): string
----@field getJob fun(playerId: integer, returnGrade: boolean?): string, integer?
----@field getMoney fun(playerId: integer, account: 'cash'|'bank'): integer?
----@field setJob fun(playerId: integer, jobName: string, jobGrade: integer)
----@field setMoney fun(playerId: integer, account: 'cash'|'bank', amount: integer)
 
 ---@class HRLibInputDialogueTextOptions
 ---@field label string
@@ -198,7 +166,6 @@
 ---@field modAPlate number?
 ---@field modSpeakers number?
 ---@field modTrunk number?
----@field modHydrolic number?
 ---@field modEngineBlock number?
 ---@field modAirFilter number?
 ---@field modStruts number?
