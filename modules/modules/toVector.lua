@@ -1,4 +1,5 @@
 ---@param coords vector4|number[]
+---@return vector4?
 HRLib.ToVector4 = function(coords)
     if type(coords) == 'vector4' then return coords end
     if type(coords) ~= 'table' and (type(coords) == 'table' and table.type(coords) == 'array' and type(coords[1]) ~= 'number' and type(coords[2]) ~= 'number' and type(coords[3]) ~= 'number' and type(coords[4]) ~= 'number') then return end
@@ -23,6 +24,7 @@ HRLib.ToVector3 = function(coords)
 end
 
 ---@param coords vector4|vector3|vector2|number[]
+---@return vector2?
 HRLib.ToVector2 = function(coords)
     if type(coords) == 'vector2' then return coords end
     if type(coords) ~= 'vector4' and type(coords) ~= 'vector3' and type(coords) ~= 'table' and (type(coords) == 'table' and table.type(coords) == 'array' and type(coords[1]) ~= 'number' and type(coords[2]) ~= 'number') then return end
