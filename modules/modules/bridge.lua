@@ -3,7 +3,9 @@ local esxStatus, qbStatus = GetResourceState('es_extended'), GetResourceState('q
 
 if (esxStatus == 'missing' or esxStatus == 'stopped') and (qbStatus == 'missing' or qbStatus == 'stopped') then return end
 
-if esxStatus == 'starting' or qbStatus == 'starting' then
+if esxStatus == 'starting' or qbStatus == 'starting' or esxStatus == 'stopped' or qbStatus == 'stopped' then
+    if esxStatus == 'stopped' or qbStatus == 'stopped' then StartResource(esxStatus == 'stopped' and 'es_extended' or 'qb-core') end
+
     while not esxStatus == 'started' or qbStatus == 'started' do
         esxStatus, qbStatus = GetResourceState('es_extended'), GetResourceState('qb-core')
 
@@ -24,7 +26,7 @@ HRLib.bridge.type = esxStatus == 'started' and 'esx' or qbStatus == 'started' an
 if serverSide then
     ---@param playerId integer
     ---@param nameType 'firstname'|'lastname'? Default: 'Firstname Lastname' (both two names in one string)
-    ---@return string?
+    ---@return string? playerName
     HRLib.bridge.getName = function(playerId, nameType)
         if HRLib.DoesIdExist(playerId) then
             if HRLib.bridge.type == 'esx' then
@@ -65,7 +67,7 @@ if serverSide then
 
     ---@param playerId integer
     ---@param account 'cash'|'bank'
-    ---@return integer?
+    ---@return integer? moneyBalance
     HRLib.bridge.getMoney = function(playerId, account)
         if HRLib.DoesIdExist(playerId) then
             if HRLib.bridge.type == 'esx' then
@@ -113,7 +115,9 @@ if serverSide then
     ---@param account 'cash'|'bank'
     ---@param amount integer
     HRLib.bridge.removeMoney = function(playerId, account, amount)
-        HRLib.bridge.setMoney(playerId, account, HRLib.bridge.getMoney(playerId, account) - amount)
+        if account == 'cash' or account == 'bank' and type(amount) == 'number' then
+            HRLib.bridge.setMoney(playerId, account, HRLib.bridge.getMoney(playerId, account) - math.tointeger(amount))
+        end
     end
 else
     --TODO: in test period, test it
@@ -130,11 +134,12 @@ else
     --     end
     -- })
 
-    HRLib.bridge.GetPlayerData = function()
+    ---@return table playerData
+    HRLib.bridge.getPlayerData = function()
         if HRLib.bridge.type == 'esx' then
             return HRLib.bridge.framework.GetPlayerData()
         elseif HRLib.bridge.type == 'qb' then
             return HRLib.bridge.framework.Functions.GetPlayerData()
-        end
+        end ---@diagnostic disable-line: missing-return
     end
 end
