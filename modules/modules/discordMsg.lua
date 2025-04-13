@@ -2,18 +2,18 @@ if not IsDuplicityVersion() then return end
 
 local config <const> = HRLib.require('@HRLib/config.lua') --[[@as HRLibConfig]]
 
----@param webHook string URL of Discord WebHook bot
+---@param webHook string? URL of Discord WebHook bot
 ---@param botName string name of the bot
----@param title string title of the notification
+---@param title string? title of the notification
 ---@param message string message of the notification
 ---@param type string? if type nil then type is rich
----@param color number color of the message
----@param icon string URL of an image
----@param author string author of the message
+---@param color number? color of the message
+---@param icon string? URL of an image
+---@param author string? author of the message
 HRLib.DiscordMsg = function(webHook, botName, title, message, type, color, icon, author)
     local Bot <const> = webHook or config.defaultWebHook
 
-    if not Bot then return end
+    if not Bot or not message then return end
 
     type = not type and 'rich' or type
     color = not color and 555555 or color
