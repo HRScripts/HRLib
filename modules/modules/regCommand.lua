@@ -3,10 +3,9 @@ if IsDuplicityVersion() then
     ---@param name string|string[] the name of the command
     ---@param accessFromConsole boolean allow access to the command from the console
     ---@param accessFromInGame boolean allow access to the command from the game
-    ---@param cb fun(args: string[]|any[], rawCommand: any, IPlayer: HRLibServerIPlayer, FPlayer: HRLibServerFPlayer) return values: args, rawCommand, IPlayer, FPlayer
-    ---@param isPlayerAllowed boolean? only ace allowed players can access the command ( command.cmdName )
+    ---@param cb fun(args: string[]|{}, rawCommand: any, IPlayer: HRLibServerIPlayer|table, FPlayer: HRLibServerFPlayer) return values: args, rawCommand, IPlayer, FPlayer
     ---@param suggestions { help: string?, restricted: boolean?, args: { name: string, help: string }[]? }?
-    HRLib.RegCommand = function(name, accessFromConsole, accessFromInGame, cb, isPlayerAllowed, suggestions)
+    HRLib.RegCommand = function(name, accessFromConsole, accessFromInGame, cb, suggestions)
         suggestions = type(suggestions) == 'table' and suggestions or {}
         local commandExists
 
@@ -19,12 +18,8 @@ if IsDuplicityVersion() then
         end
 
         if not commandExists then
-            if type(name) ~= 'string' or not accessFromConsole and not accessFromInGame then
-                return
-            end
-
-            if not isPlayerAllowed then
-                isPlayerAllowed = false
+            if type(name) ~= 'string' or type(name) == 'table' and table.type(name) ~= 'array' or not accessFromConsole and not accessFromInGame then
+                return warn(('^1%s^3 tried to register a client command ^1without^3 name!^0'):format(resName == 'HRLib' and GetInvokingResource() or resName))
             end
 
             if HRLib.registeredCmds[name] then
@@ -33,16 +28,16 @@ if IsDuplicityVersion() then
                 TriggerClientEvent('chat:removeSuggestion', -1, '/'..name)
             end
 
-            HRLib.registeredCmds[name] = {accessFromConsole = accessFromConsole, accessFromInGame = accessFromInGame, cb = cb, isPlayerAllowed = isPlayerAllowed, suggestions = suggestions}
+            HRLib.registeredCmds[name] = {accessFromConsole = accessFromConsole, accessFromInGame = accessFromInGame, cb = cb, suggestions = suggestions}
 
             if type(suggestions) == 'table' and table.type(suggestions) ~= 'empty' then
-                if not isPlayerAllowed then
-                    TriggerClientEvent('chat:addSuggestion', -1, '/'..name, suggestions.help or '', suggestions.args or {})
+                if not suggestions.isRestricted then
+                    TriggerClientEvent('chat:addSuggestion', -1, '/'..name, suggestions.help or '', (type(suggestions.args) == 'table' and table.type(suggestions.args) == 'array') and suggestions.args or {})
                 else
                     local players <const> = GetPlayers()
                     for i=1, #players do
                         if IsPlayerAceAllowed(players[i], name) then
-                            TriggerClientEvent('chat:addSuggestion', tonumber(players[i]) --[[@as integer]], '/'..name, suggestions.help or '', suggestions.args or {})
+                            TriggerClientEvent('chat:addSuggestion', tonumber(players[i]) --[[@as integer]], '/'..name, suggestions.help or '', (type(suggestions.args) == 'table' and table.type(suggestions.args) == 'array') and suggestions.args or {})
                         end
                     end
                 end
@@ -82,44 +77,14 @@ if IsDuplicityVersion() then
                         return
                     end
 
-                    if not isPlayerAllowed or IsPlayerAceAllowed(source, 'command.'..name) == 1 then
-                        cb(args, rawCommand, HRLib.GetIPlayer(source) --[[@as HRLibServerIPlayer]], HRLib.GetFPlayer(source) --[[@as HRLibServerFPlayer]])
-                    end
+                    cb(args, rawCommand, HRLib.GetIPlayer(source) --[[@as HRLibServerIPlayer]], HRLib.GetFPlayer(source) --[[@as HRLibServerFPlayer]])
                 elseif accessFromConsole and accessFromInGame then
-                    if not isPlayerAllowed then
-                        local IPlayer <const>, FPlayer <const> = HRLib.GetIPlayer(source) --[[@as HRLibServerIPlayer]] or {
-                            id = source, playerId = source, source = source, Id = source, serverId = source,
-                            name = 'TxAdmin Console'
-                        }, HRLib.GetFPlayer(source) --[[@as HRLibServerFPlayer]] or {}
+                    local IPlayer <const>, FPlayer <const> = HRLib.GetIPlayer(source) or {
+                        id = source, playerId = source, source = source, Id = source, serverId = source,
+                        name = 'TxAdmin Console'
+                    }, HRLib.GetFPlayer(source) or {}
 
-                        if table.type(FPlayer) == 'empty' then
-                            function FPlayer:Notify(text, type)
-                                if not text then return end
-                                if not type then type = 'info' end
-
-                                if type == 'success' then
-                                    print(('^2! SUCCESS ! %s^0'):format(text))
-                                elseif type == 'error' then
-                                    print(('^1! ERROR ! %s^0'):format(text))
-                                elseif type == 'warning' or type == 'warn' then
-                                    print(('^3! WARNING ! %s^0'):format(text))
-                                elseif type == 'info' then
-                                    print(('^5! INFO ! %s^0'):format(text))
-                                end
-                            end
-                        end
-
-                        cb(args, rawCommand, IPlayer, FPlayer)
-                    elseif isPlayerAllowed and source ~= 0 then
-                        if IsPlayerAceAllowed(source, 'command.'..name) == 1 then
-                            cb(args, rawCommand, HRLib.GetIPlayer(source) --[[@as HRLibServerIPlayer]], HRLib.GetFPlayer(source) --[[@as HRLibServerFPlayer]])
-                        end
-                    elseif isPlayerAllowed and source == 0 then
-                        local IPlayer <const>, FPlayer <const> = {
-                            id = source, playerId = source, source = source, Id = source, serverId = source,
-                            name = 'TxAdmin Console'
-                        }, {}
-
+                    if table.type(FPlayer) == 'empty' then
                         function FPlayer:Notify(text, type)
                             if not text then return end
                             if not type then type = 'info' end
@@ -134,18 +99,19 @@ if IsDuplicityVersion() then
                                 print(('^5! INFO ! %s^0'):format(text))
                             end
                         end
-
-                        cb(args, rawCommand, IPlayer, FPlayer)
                     end
+
+                    cb(args, rawCommand, IPlayer, FPlayer)
                 end
             end
             local isRestricted <const> = type(suggestions.restricted) == 'boolean' and suggestions.restricted or false
-
-            if type(name) == 'string' then
+            if type(name) == 'string' and name ~= '' then
                 RegisterCommand(name, regCmdFn, isRestricted)
             else
                 for i=1, #name do
-                    RegisterCommand(name[i], regCmdFn, isRestricted)
+                    if type(name[i]) == 'string' and name[i] ~= '' and not string.find(name, ' ') then
+                        RegisterCommand(name[i], regCmdFn, isRestricted)
+                    end
                 end
             end
         end
@@ -154,38 +120,37 @@ if IsDuplicityVersion() then
     RegisterNetEvent(('__%s:CommandsSuggestions'):format(resName), function()
         for k,v in pairs(HRLib.registeredCmds) do
             if type(v.suggestions) == 'table' and table.type(v.suggestions) ~= 'empty' then
-                if not v.isPlayerAllowed and not v.suggestions.restricted then
-                    TriggerClientEvent('chat:addSuggestion', source, ('/%s'):format(k), v.suggestions.help or '', v.suggestions.args or {})
+                if not v.suggestions.restricted then
+                    TriggerClientEvent('chat:addSuggestion', source, ('/%s'):format(k), v.suggestions.help or '', (type(v.suggestions.args) == 'table' and table.type(v.suggestions.args) == 'array') and v.suggestions.args or {})
                 else
                     if IsPlayerAceAllowed(source, ('command.%s'):format(k)) then
-                        TriggerClientEvent('chat:addSuggestion', source, ('/%s'):format(k), v.suggestions.help or '', v.suggestions.args or {})
+                        TriggerClientEvent('chat:addSuggestion', source, ('/%s'):format(k), v.suggestions.help or '', (type(v.suggestions?.args) == 'table' and table.type(v.suggestions?.args) == 'array') and v.suggestions?.args or {})
                     end
                 end
             end
         end
     end)
 else
-    ---@param name string name of the command
-    ---@param cb fun(args: string[]|any[], rawCommand: any, IPlayer: HRLibClientIPlayer, FPlayer: HRLibClientFPlayer) function arguments: args, rawCommand, IPlayer
-    ---@param suggestion { help: string?, restricted: boolean?, args: table[]? }?
-    HRLib.RegCommand = function(name, cb, suggestion)
-        suggestion = type(suggestion) == 'table' and suggestion or {}
+    ---@param name string|string[] name of the command
+    ---@param cb fun(args: string[]|{}, rawCommand: any, IPlayer: HRLibClientIPlayer, FPlayer: HRLibClientFPlayer) function arguments: args, rawCommand, IPlayer
+    ---@param suggestions { help: string?, args: { name: string, help: string }[]? }?
+    HRLib.RegCommand = function(name, cb, suggestions)
+        suggestions = type(suggestions) == 'table' and suggestions or {}
 
-        if not name or name == '' then
-            warn(('^1%s^3 tried to register a client command ^1without^3 name!^0'):format(GetInvokingResource()))
-            return
+        if not name or name == '' or type(name) ~= 'table' or type(name) == 'table' and table.type(name) ~= 'array' then
+            return warn(('^1%s^3 tried to register a client command ^1without^3 name!^0'):format(resName == 'HRLib' and GetInvokingResource() or resName))
         end
 
         if HRLib.registeredCmds[name] then
             TriggerEvent('chat:removeSuggestion', ('/%s'):format(name))
         end
 
-        HRLib.registeredCmds[name] = { cb = cb, suggestions = suggestion }
+        HRLib.registeredCmds[name] = { cb = cb, suggestions = type(suggestions) == 'table' and suggestions }
 
-        TriggerEvent('chat:addSuggestion', ('/%s'):format(name), suggestion.help or '', suggestion.args or {})
+        TriggerEvent('chat:addSuggestion', ('/%s'):format(name), suggestions.help or '', (type(suggestions.args) == 'table' and table.type(suggestions.args) == 'array') and suggestions.args or {})
 
-        RegisterCommand(name, function(_, args, rawCommand)
-            local IPlayer <const> = HRLib.GetIPlayer(GetPlayerServerId(PlayerId())) --[[@as HRLibClientIPlayer? ]]
+        local callback = function(_, args, rawCommand)
+            local IPlayer <const> = HRLib.GetIPlayer(GetPlayerServerId(PlayerId())) --[[@as HRLibClientIPlayer]]
 
             if not IPlayer then return end
 
@@ -195,7 +160,17 @@ else
                 IPlayer,
                 HRLib.GetFPlayer() --[[@as HRLibClientFPlayer]]
             )
-        end, false)
+        end
+
+        if name == 'string' then
+            RegisterCommand(name, callback, false)
+        else
+            for i=1, #name do
+                if type(name[i]) == 'string' and name[i] ~= '' then
+                    RegisterCommand(name[i], callback, false)
+                end
+            end
+        end
     end
 
     AddEventHandler('playerSpawned', function()
@@ -209,7 +184,7 @@ else
 
         for k,v in pairs(HRLib.registeredCmds) do
             if type(v.suggestions) == 'table' and table.type(v.suggestions) ~= 'empty' then
-                TriggerEvent('chat:addSuggestion', ('/%s'):format(k), v.suggestions.help or '', v.suggestions.args or {})
+                TriggerEvent('chat:addSuggestion', ('/%s'):format(k), v.suggestions.help or '', (type(v.suggestion.args) == 'table' and table.type(v.suggestion.args) == 'array') and v.suggestion.args or {})
             end
         end
     end)
