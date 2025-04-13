@@ -8,6 +8,7 @@ for i=1, #modules do
     load(LoadResourceFile('HRLib', path), ('@@HRLib/%s'):format(path))()
 end
 
+local config <const> = HRLib.require('@HRLib/config.lua') --[[@as HRLibConfig]]
 if IsDuplicityVersion() then
     if not GetResourceMetadata(resName, 'remove_versionCheck', 0) then
         local repository, matchCode <const> = GetResourceMetadata(resName, 'repository', 0), '%d+%.%d+%.%d+'
@@ -59,6 +60,64 @@ if IsDuplicityVersion() then
             warn('The restarting/stopping of ^5hrlib^3 is not recommended! You may have error at our other scripts and the commands from the other resources will not be registered!')
         end
     end)
+elseif config.debug.enable == true then
+    HRLib.RegCommand(config.debug.commandName, function(args, rawCommand, IPlayer, FPlayer)
+        local fnType = args[1]
+        local paramsText = ''
+
+        if #args > 1 then
+            for i=2, #args do
+                paramsText = ('%s%s%s'):format(paramsText, i == 2 and '' or ' ', args[i])
+            end
+        end
+
+        if fnType == 'showTextUI' then
+            HRLib.showTextUI(#paramsText > 0 and paramsText or 'this is a test')
+        elseif fnType == 'isTextUIOpen' then
+            print('isTextUIOpen debug with returned last textUI content:', HRLib.isTextUIOpen(true))
+        elseif fnType == 'hideTextUI' then
+            HRLib.hideTextUI()
+        elseif fnType == 'progressBar' then
+            HRLib.progressBar(args[2] or 'horizontal', {
+                duration = 2500,
+                description = args[3] or 'Progress Bar'
+            })
+        elseif fnType == 'alertDialogue' then
+            HRLib.createAlertDialogue({
+                title = 'Alert Dialogue',
+                description = 'This is a test dialogue, do you agree?',
+                onAgree = function()
+                    print('You agreed!')
+                end,
+                onCancel = function()
+                    print('You didn\'t want to agree :(')
+                end
+            })
+        elseif fnType == 'inputDialogue' then
+            local result <const> = HRLib.createInputDialogue({
+                title = 'Input Dialogue',
+                questions = {
+                    {
+                        type = 'text',
+                        options = {
+                            label = 'Test input',
+                            placeholder = 'fill in the blank'
+                        }
+                    }
+                },
+                onCancel = function()
+                    print('Why did you canceled?')
+                end
+            })
+            if result then
+                print('You said:', result[1])
+            end
+        elseif fnType == 'notify' then
+            HRLib.Notify(paramsText or 'Test notification', HRLib.table.find({ 'success', 'error', 'info', 'warning' }, args[#args]) and args[#args] or ({ 'success', 'error', 'info', 'warning' })[math.random(1, 4)])
+        else
+            print('Invalid debug type! The type must be in the exact way as in the description to use it')
+        end
+    end, { help = config.debug.commandHelp, args = { { name = config.debug.args.type.name, help = config.debug.args.type.help }, { name = config.debug.args.secondParameter.name, help = config.debug.args.secondParameter.help } } })
 end
 
 exports('getLibFunctions', function()
