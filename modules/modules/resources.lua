@@ -1,7 +1,7 @@
-local isServer <const> = IsDuplicityVersion()
+local isServer <const>, res <const> = IsDuplicityVersion(), GetCurrentResourceName()
 
 ---@param path string the file path (format: '@MyResource/server/server.lua')
----@return any?
+---@return any? result
 HRLib.require = function(path)
     if type(path) ~= 'string' or not string.find(path, '@') or not string.find(path, '/') then return end
 
@@ -45,22 +45,6 @@ require = HRLib.require
 
 ---@param resName string|'any'? string the resource name or nil for the current one
 ---@param cb function
-HRLib.OnStart = function(resName, cb)
-    if type(cb) ~= 'function' or (type(cb) == 'table' and not cb['__cfx_functionReference']) then return end
-
-    resName = resName or GetCurrentResourceName()
-
-    AddEventHandler('onResourceStart', function(resource)
-        if resource == resName then
-            cb(resource)
-        elseif resName == 'any' then
-            cb(resource)
-        end
-    end)
-end
-
----@param resName string|'any'? string the resource name or nil for the current one
----@param cb function
 HRLib.OnStop = function(resName, cb)
     if type(cb) ~= 'function' or (type(cb) == 'table' and not cb['__cfx_functionReference']) then return end
 
@@ -75,72 +59,60 @@ HRLib.OnStop = function(resName, cb)
     end)
 end
 
----@param resName string|'any'? string the resource name or nil for the current one
----@param cb function
-HRLib.OnStarting = function(resName, cb)
-    if type(cb) ~= 'function' or (type(cb) == 'table' and not cb['__cfx_functionReference']) then return end
-
-    resName = resName or GetCurrentResourceName()
-
-    AddEventHandler('onResourceStarting', function(resource)
-        if resource == resName then
-            cb(resource)
-        elseif resName == 'any' then
-            cb(resource)
-        end
-    end)
-end
-
----@param resName string|'any'? string the resource name or nil for the current one
----@param cb fun(resource: string)
-HRLib.OnRefresh = function(resName, cb)
-    resName = resName or GetCurrentResourceName()
-
-    AddEventHandler('onResourceListRefresh', function(resource)
-        if resource == resName then
-            cb(resource)
-        elseif resName == 'any' then
-            cb(resource)
-        end
-    end)
-end
-
----@param cb fun(playerName: string, setKickReason: string, deferrals: table)|fun(source: integer, playerName: string, setKickReason: string, deferrals: table)
-HRLib.OnPlConnecting = function(cb)
-    if type(cb) ~= 'function' or (type(cb) == 'table' and not cb['__cfx_functionReference']) then return end
-
-    AddEventHandler('playerConnecting', function(...)
-        if isServer then
-            cb(source, ...)
-        else
-            cb(...)
-        end
-    end)
-end
-
----@param cb function|fun(source: integer)
-HRLib.OnPlJoining = function(cb)
-    if type(cb) ~= 'function' or (type(cb) == 'table' and not cb['__cfx_functionReference']) then return end
-
-    AddEventHandler('playerJoining', function()
-        cb(source)
-    end)
-end
-
----@param cb fun(reason: string)|fun(source: integer, reason: string)
-HRLib.OnPlDisc = function(cb)
-    if type(cb) ~= 'function' or (type(cb) == 'table' and not cb['__cfx_functionReference']) then return end
-
-    AddEventHandler('playerDropped', function(...)
-        if isServer then
-            cb(source, ...)
-        else
-            cb(...)
-        end
-    end)
-end
-
 if not isServer then
+    ---@param resName string|'any' string the resource name or nil for the current one
+    ---@param cb function
+    HRLib.OnStart = function(resName, cb)
+        if type(cb) ~= 'function' or (type(cb) == 'table' and not cb['__cfx_functionReference']) then return end
+
+        AddEventHandler('onResourceStart', function(resource)
+            if resource == resName then
+                cb(resource)
+            elseif resName == 'any' then
+                cb(resource)
+            end
+        end)
+    end
+
+    ---@param resName string|'any' string the resource name or nil for the current one
+    ---@param cb function
+    HRLib.OnStarting = function(resName, cb)
+        if type(cb) ~= 'function' or (type(cb) == 'table' and not cb['__cfx_functionReference']) then return end
+
+        AddEventHandler('onResourceStarting', function(resource)
+            if resource == resName then
+                cb(resource)
+            elseif resName == 'any' then
+                cb(resource)
+            end
+        end)
+    end
+
+    ---@param cb fun(playerName: string, setKickReason: string, deferrals: table)
+    HRLib.OnPlConnecting = function(cb)
+        if type(cb) ~= 'function' or (type(cb) == 'table' and not cb['__cfx_functionReference']) then return end
+
+        AddEventHandler('playerConnecting', function(...)
+            cb(...)
+        end)
+    end
+
+    ---@param cb function
+    HRLib.OnPlJoining = function(cb)
+        if type(cb) ~= 'function' or (type(cb) == 'table' and not cb['__cfx_functionReference']) then return end
+
+        AddEventHandler('playerJoining', cb)
+    end
+
+    ---@param cb fun(reason: string)
+    HRLib.OnPlDisc = function(cb)
+        if type(cb) ~= 'function' or (type(cb) == 'table' and not cb['__cfx_functionReference']) then return end
+
+        AddEventHandler('playerDropped', function(...)
+            cb(...)
+        end)
+    end
+
     ---@param cb fun(spawnInfo: { x: number, y: number, z: number, heading: number, idx: integer, model: integer })
     HRLib.OnPlSpawn = function(cb)
         if type(cb) ~= 'function' or (type(cb) == 'table' and not cb['__cfx_functionReference']) then return end
@@ -150,12 +122,76 @@ if not isServer then
         end)
     end
 else
+    ---@param resName string|'any'? string the resource name or nil for the current one
+    ---@param cb function
+    HRLib.OnStart = function(resName, cb)
+        if type(cb) ~= 'function' or (type(cb) == 'table' and not cb['__cfx_functionReference']) then return end
+
+        resName = resName or GetCurrentResourceName()
+
+        AddEventHandler('onResourceStart', function(resource)
+            if resource == resName then
+                cb(resource)
+            elseif resName == 'any' then
+                cb(resource)
+            end
+        end)
+    end
+
+    ---@param resName string|'any'? string the resource name or nil for the current one
+    ---@param cb function
+    HRLib.OnStarting = function(resName, cb)
+        if type(cb) ~= 'function' or (type(cb) == 'table' and not cb['__cfx_functionReference']) then return end
+
+        resName = resName or GetCurrentResourceName()
+
+        AddEventHandler('onResourceStarting', function(resource)
+            if resource == resName then
+                cb(resource)
+            elseif resName == 'any' then
+                cb(resource)
+            end
+        end)
+    end
+
+    ---@param cb function
+    HRLib.OnRefresh = function(cb)
+        if type(cb) == 'function' or type(cb) == 'table' and cb['__cfx_functionReference'] then
+            AddEventHandler('onResourceListRefresh', cb --[[@as function]])
+        end
+    end
+
+    ---@param cb fun(source: integer, playerName: string, setKickReason: string, deferrals: table)
+    HRLib.OnPlConnecting = function(cb)
+        if type(cb) ~= 'function' or (type(cb) == 'table' and not cb['__cfx_functionReference']) then return end
+
+        AddEventHandler('playerConnecting', function(...)
+            cb(source, ...)
+        end)
+    end
+
+    ---@param cb fun(source: integer)
+    HRLib.OnPlJoining = function(cb)
+        if type(cb) ~= 'function' or (type(cb) == 'table' and not cb['__cfx_functionReference']) then return end
+
+        AddEventHandler('playerJoining', function()
+            cb(source)
+        end)
+    end
+
+    ---@param cb fun(source: integer, reason: string)
+    HRLib.OnPlDisc = function(cb)
+        if type(cb) ~= 'function' or (type(cb) == 'table' and not cb['__cfx_functionReference']) then return end
+
+        AddEventHandler('playerDropped', function(...)
+            cb(source, ...)
+        end)
+    end
+
     ---@param msgtype 'warn'|'error'
     ---@param msg string
     HRLib.StopMyself = function(msgtype, msg)
-        if isServer == 1 then
-            TriggerEvent('__HRLib:StopMyself', GetCurrentResourceName(), msgtype, msg)
-        end
+        TriggerEvent('__HRLib:StopMyself', GetCurrentResourceName(), msgtype, msg)
     end
 
     ---@param resName string|'any'? string the resource name or nil for the current one
