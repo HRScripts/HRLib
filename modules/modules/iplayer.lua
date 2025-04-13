@@ -4,12 +4,11 @@ if IsDuplicityVersion() then
     local pli = GetPlayerIdentifierByType --[[@as fun(playerSrc: integer, identifierType: string): string]]
 
     ---@param playerId integer An existing player server Id
-    ---@return HRLibServerIPlayer?
+    ---@return HRLibServerIPlayer? IPlayer
     HRLib.GetIPlayer = function(playerId)
         if HRLib.DoesIdExist(playerId) then
             local p <const> = GetPlayerPed(playerId)
-            local veh <const> = GetVehiclePedIsIn(p, false)
-            return {
+            return setmetatable({
                 source = playerId, id = playerId, Id = playerId, ID = playerId, playerId = playerId, player = playerId, serverId = playerId, plId = playerId, serverPlId = playerId, sPlId = playerId,
                 state = Player(playerId).state,
                 name = GetPlayerName(playerId) or 'undefined',
@@ -23,13 +22,10 @@ if IsDuplicityVersion() then
                     ip = pli(playerId, 'ip') or 'undefined',
                     fivem = pli(playerId, 'fivem') or 'undefined',
                 },
-                identifiersNum = GetNumPlayerIdentifiers(playerId),
-                ping = GetPlayerPing(playerId),
                 max = {
                     health = GetPlayerMaxHealth(playerId),
                     armour = GetPlayerMaxArmour(playerId),
                 },
-                ped = p,
                 tokens = {
                     t1 = GetPlayerToken(playerId, 0) or 'undefined',
                     t2 = GetPlayerToken(playerId, 1) or 'undefined',
@@ -38,82 +34,49 @@ if IsDuplicityVersion() then
                     allString = ('%s\n%s\n%s\n%s'):format(GetPlayerToken(playerId, 0) or 'undefined', GetPlayerToken(playerId, 1) or 'undefined', GetPlayerToken(playerId, 2) or 'undefined', GetPlayerToken(playerId, 3) or 'undefined'),
                     num = GetNumPlayerTokens(playerId),
                 },
-                camRotation = GetConvar('onesync', 'no') == 'on' and GetPlayerCameraRotation(playerId) or GetConvar('onesync', 'no') == 'legacy' and GetPlayerCameraRotation(playerId) or vector3(0, 0, 0),
-                endPoint = GetPlayerEndpoint(playerId),
-                fakeWantedLvl = GetConvar('onesync', 'no') == 'on' and GetPlayerFakeWantedLevel(playerId) or GetConvar('onesync', 'no') == 'legacy' and GetPlayerFakeWantedLevel(playerId) or 0,
-                guid = GetPlayerGuid(playerId),
-                invincible = GetPlayerInvincible(playerId),
-                lastMsg = GetPlayerLastMsg(playerId),
-                rountingBucket = GetPlayerRoutingBucket(playerId),
-                team = GetPlayerTeam(playerId),
-                wanted = {
-                    centrePos = GetConvar('onesync', 'no') == 'on' and GetPlayerWantedCentrePosition(playerId) or GetConvar('onesync', 'no') == 'legacy' and GetPlayerWantedCentrePosition(playerId) or vector3(0, 0, 0),
-                    lvl = GetPlayerWantedLevel(playerId),
-                },
-                weapon = {
-                    dmgModifier = GetPlayerWeaponDamageModifier(playerId),
-                    defModifier = GetPlayerWeaponDefenseModifier(playerId),
-                    defModifier_2 = GetPlayerWeaponDefenseModifier_2(playerId),
-                    maleeWeaponDmgModifier = GetPlayerMeleeWeaponDamageModifier(playerId),
-                },
-                coords = GetConvar('onesync', 'no') == 'on' and GetEntityCoords(p) or GetConvar('onesync', 'no') == 'legacy' and GetEntityCoords(p) or vector3(0, 0, 0),
-                heading = GetEntityHeading(p),
-                health = GetEntityHealth(p),
-                entity = {
-                    attachedTo = GetEntityAttachedTo(p),
+                entity = setmetatable({
                     isFreezed = IsEntityPositionFrozen(p),
                     model = GetEntityModel(p),
                     populationType = GetEntityPopulationType(p),
-                    rotation = GetEntityRotation(p),
-                    rotationVelocity = GetEntityRotationVelocity(p),
-                    rountingBucket = GetEntityRoutingBucket(p),
-                    script = GetEntityScript(p),
-                    speed = GetEntitySpeed(p),
                     type = GetEntityType(p),
-                    velocity = GetEntityVelocity(p),
-                    sourceOfDamage = GetConvar('onesync', 'no') == 'on' and GetPedSourceOfDamage(p) or GetConvar('onesync', 'no') == 'legacy' and GetPedSourceOfDamage(p) or 0,
-                    sourceOfDeath = GetConvar('onesync', 'no') == 'on' and GetPedSourceOfDeath(p) or GetConvar('onesync', 'no') == 'legacy' and GetPedSourceOfDeath(p) or 0,
                     isVisible = IsEntityVisible(p),
                     netId = NetworkGetNetworkIdFromEntity(p),
-                },
-                veh = {
-                    bodyHealth = GetVehicleBodyHealth(veh),
-                    colours = { GetVehicleColours(veh) },
-                    custom = {
-                        primaryColour = { GetVehicleCustomPrimaryColour(veh) },
-                        secondaryColour = { GetVehicleCustomSecondaryColour(veh) }
-                    },
-                    dashboardColour = GetVehicleDashboardColour(veh),
-                    dirtLevel = GetVehicleDirtLevel(veh),
-                    doorLockStatus = GetVehicleDoorLockStatus(veh),
-                    doorsLockedForPlayer = GetVehicleDoorsLockedForPlayer(veh),
-                    engineHealth = GetVehicleEngineHealth(veh),
-                    extraColours = { GetVehicleExtraColours(veh) },
-                    flightNozzlePosition = GetVehicleFlightNozzlePosition(veh),
-                    handbrake = GetVehicleHandbrake(veh),
-                    headlightsColour = GetVehicleHeadlightsColour(veh),
-                    homingLockonState = GetVehicleHomingLockonState(veh),
-                    interiorColour = GetVehicleInteriorColour(veh),
-                    lightsState = { GetVehicleLightsState(veh) },
-                    livery = GetVehicleLivery(veh),
-                    lockOnTarget = { GetVehicleLockOnTarget(veh) }, ---@diagnostic disable-line: assign-type-mismatch
-                    plate = GetVehicleNumberPlateText(veh),
-                    plateIndex = GetVehicleNumberPlateTextIndex(veh),
-                    petrolTankHealth = GetVehiclePetrolTankHealth(veh),
-                    radioStationIndex = GetVehicleRadioStationIndex(veh),
-                    roofLivery = GetVehicleRoofLivery(veh),
-                    steeringAngle = GetVehicleSteeringAngle(veh),
-                    type = GetVehicleType(veh),
-                    tyreSmokeColor = { GetVehicleTyreSmokeColor(veh) },
-                    wheelType = GetVehicleWheelType(veh),
-                    windowTint = GetVehicleWindowTint(veh)
-                },
-                vehicle = veh -- The shorter way for taking the vehicle which the player sits in. The equivalent is veh.pedIsIn
-            } --[[@as HRLibServerIPlayer]]
+                    networkId = NetworkGetNetworkIdFromEntity(p)
+                }, {
+                    __index = function(self, k)
+                        local modules <const> = HRLib.table.getKeys(self, true) --[[@as string[] ]]
+                        for i=1, #modules do
+                            local curr <const> = modules[i]
+                            rawset(self, curr, (curr == 'isFreezed' and IsEntityPositionFrozen or curr == 'model' and GetEntityModel or curr == 'populationType' and GetEntityPopulationType or curr == 'type' and GetEntityType or curr == 'isVisible' and IsEntityVisible or NetworkGetNetworkIdFromEntity)(GetPlayerPed(playerId)))
+                        end
+
+                        return rawget(self, k)
+                    end
+                })
+            }, {
+                __index = function(self, k)
+                    local ped <const> = GetPlayerPed(playerId)
+                    if k == 'ping' then
+                        return GetPlayerPing(ped)
+                    elseif k == 'ped' then
+                        return GetPlayerPed(ped)
+                    elseif k == 'coords' or k == 'coordinates' then
+                        return GetConvar('onesync', 'no') ~= 'on' and GetEntityCoords(ped) or vector3(0, 0, 0)
+                    elseif k == 'heading' then
+                        return GetEntityHeading(ped)
+                    elseif k == 'health' then
+                        return GetEntityHealth(ped)
+                    elseif k == 'identifiersNum' then
+                        return GetNumPlayerIdentifiers(playerId)
+                    end
+
+                    return rawget(self, k)
+                end
+            })
         end
     end
 
-    ---@return HRLibServerIPlayer[]|{}
+    ---@return HRLibServerIPlayer[]? allIPlayers
     HRLib.AllIPlayers = function()
         local allIPlayers <const> = {}
 
@@ -122,102 +85,66 @@ if IsDuplicityVersion() then
             allIPlayers[#allIPlayers+1] = HRLib.GetIPlayer(tonumber(pls[i]) --[[@as integer]])
         end
 
-        return allIPlayers
+        return #allIPlayers > 0 and allIPlayers or nil
     end
 else
     ---@param playerId integer An existing player server Id
-    ---@return HRLibClientIPlayer?
+    ---@return HRLibClientIPlayer? IPlayer
     HRLib.GetIPlayer = function(playerId)
         if HRLib.DoesIdExist(playerId) then
-            local p <const> = GetPlayerPed(GetPlayerFromServerId(playerId))
-            local coo <const> = GetEntityCoords(p)
-            return {
+            local p <const> = GetPlayerFromServerId(playerId)
+            return setmetatable({
                 source = playerId, id = playerId, Id = playerId, ID = playerId, playerId = playerId, player = playerId, serverId = playerId, plId = playerId, serverPlId = playerId, sPlId = playerId,
                 state = LocalPlayer.state,
-                invincible_2 = GetPlayerInvincible_2(playerId),
-                max = {
+                max = setmetatable({
                     stamina = GetPlayerMaxStamina(playerId),
                     armour = GetPlayerMaxArmour(playerId),
-                    health = GetEntityMaxHealth(p),
-                },
-                currStamina = GetPlayerStamina(playerId),
-                vehicle = GetVehiclePedIsIn(p), ---@diagnostic disable-line: missing-parameter
-                veh = {
-                    dmgModifier = GetPlayerVehicleDamageModifier(playerId),
-                    defModifier = GetPlayerVehicleDefenseModifier(playerId),
-                },
-                weapon = {
-                    dmgModifier = GetPlayerWeaponDamageModifier(playerId),
-                    defModifier = GetPlayerWeaponDefenseModifier(playerId),
-                    defModifier_2 = GetPlayerWeaponDefenseModifier_2(playerId),
-                    malee = {
-                        dmgModifier = GetPlayerMeleeWeaponDamageModifier(playerId),
-                        defModifier = GetPlayerMeleeWeaponDefenseModifier(playerId),
-                    }
-                },
-                coords = coo, coordinates = coo,
-                heading = GetEntityHeading(p),
-                currStealthNoise = GetPlayerCurrentStealthNoise(playerId),
-                group = GetPlayerGroup(playerId),
-                invincible = GetPlayerInvincible(playerId),
+                    health = GetEntityMaxHealth(GetPlayerPed(p))
+                }, {
+                    __index = function(self, k)
+                        if k == 'health' then
+                            return GetEntityMaxHealth(GetPlayerPed(p))
+                        end
+
+                        return rawget(self, k)
+                    end
+                }),
                 name = GetPlayerName(GetPlayerFromServerId(playerId)),
-                ped = p,
-                pedIsFollowing = GetPlayerPedIsFollowing(p),
-                rgbColor = GetPlayerRgbColour(playerId),
-                team = GetPlayerTeam(playerId),
-                underWaterTimeRmng = GetPlayerUnderwaterTimeRemaining(playerId),
-                entity = {
-                    targetEntity = { GetPlayerTargetEntity(playerId) },
-                    health = GetEntityHealth(p),
-                    archeTypeName = GetEntityArchetypeName(p),
-                    attachedTo = GetEntityAttachedTo(p),
+                entity = setmetatable({
+                    archetypeName = GetEntityArchetypeName(p),
                     model = GetEntityModel(p),
-                    mapDataOwner = { GetEntityMapdataOwner(p) },
-                    alpha = GetEntityAlpha(p),
-                    forward = {
-                        vector = GetEntityForwardVector(p),
-                        x = GetEntityForwardX(p),
-                        y = GetEntityForwardY(p),
-                    },
-                    heightAboveGround = GetEntityHeightAboveGround(p),
-                    lodDist = GetEntityLodDist(p),
-                    matrix = { GetEntityMatrix(p) },
-                    pitch = GetEntityPitch(p),
+                    mapdataOwner = { GetEntityMapdataOwner(p) },
                     populationType = GetEntityPopulationType(p),
-                    quaternion = { GetEntityQuaternion(p) },
-                    roll = GetEntityRoll(p),
-                    rotationVelocity = GetEntityRotationVelocity(p),
-                    speed = GetEntitySpeed(p),
-                    submergedLvl = GetEntitySubmergedLevel(p), --
-                    type = GetEntityType(p),
-                    uprightValue = GetEntityUprightValue(p),
-                    velocity = GetEntityVelocity(p),
-                    lastHitMaterial = GetLastMaterialHitByEntity(p),
-                    nearestPl = GetNearestPlayerToEntity(p),
-                    objectIndex = GetObjectIndexFromEntityIndex(p),
-                    vehIndex = GetVehicleIndexFromEntityIndex(p),
-                    hasLoadedCollisionAround = HasCollisionLoadedAroundEntity(p),
-                    hasBeenDamagedByAnyObject = HasEntityBeenDamagedByAnyObject(p),
-                    hasBeenDamagedByAnyVeh = HasEntityBeenDamagedByAnyVehicle(p),
-                    hasCollidedWithAnything = HasEntityCollidedWithAnything(p),
-                    isAttached = IsEntityAttached(p),
-                    isAttachedToAnyObject = IsEntityAttachedToAnyObject(p),
-                    isAttachedToAnyPed = IsEntityAttachedToAnyPed(p),
-                    isAttachedToAnyVeh = IsEntityAttachedToAnyVehicle(p),
-                    isDead = IsEntityDead(p),
-                    isInAir = IsEntityInAir(p),
-                    isInWater = IsEntityInWater(p),
-                    isOccluded = IsEntityOccluded(p),
-                    isOnScreen = IsEntityOnScreen(p),
-                    isStatic = IsEntityStatic(p),
-                    isUpsideDown = IsEntityUpsidedown(p),
-                    isVisible = IsEntityVisible(p),
-                    isVisibleToScript = IsEntityVisibleToScript(p),
-                    isWaitingForWorldCollision = IsEntityWaitingForWorldCollision(p),
-                    isFreezed = IsEntityPositionFrozen(p),
-                },
-                streetName = GetStreetNameFromHashKey(GetStreetNameAtCoord(coo.x, coo.y, coo.z))
-            }
+                    type = GetEntityType(p)
+                }, {
+                    __index = function(self, k)
+                        local modules <const> = HRLib.table.getKeys(self, true)
+                        if type(modules) == 'table' then
+                            for i=1, #modules do
+                                local curr <const> = modules[i]
+                                rawset(self, curr, curr == 'mapdataOwner' and { GetEntityMapdataOwner(GetPlayerPed(p)) } or (curr == 'archeTypeName' and GetEntityArchetypeName or curr == 'model' and GetEntityModel or curr == 'populationType' and GetEntityPopulationType or GetEntityType)(GetPlayerPed(p)))
+                            end
+                        end
+
+                        return rawget(self, k)
+                    end
+                })
+            }, {
+                __index = function(self, k)
+                    local ped <const> = GetPlayerPed(p)
+                    if k == 'ped' then
+                        return GetPlayerPed(ped)
+                    elseif k == 'coords' or k == 'coordinates' then
+                        return GetEntityCoords(ped)
+                    elseif k == 'heading' then
+                        return GetEntityHeading(ped)
+                    elseif k == 'health' then
+                        return GetEntityHealth(ped)
+                    end
+
+                    return rawget(self, k)
+                end
+            })
         end
     end
 end
