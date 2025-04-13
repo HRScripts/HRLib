@@ -32,8 +32,8 @@ HRLib.string.split = function(text, delimiter, returnAllAs, isArray)
 end
 
 ---@param source string[] the text that you want to gather. Table format: {'text1', 'text2', 'text2'}
----@param delimiter string the key that gather the text (text). nil (nothing) means interval
----@return string?
+---@param delimiter string? the key that gather the text (text). nil (nothing) means interval
+---@return string? result
 HRLib.string.gather = function(source, delimiter)
     if not type(source) == 'table' then return end
     if type(delimiter) == 'nil' then delimiter = ' ' end
