@@ -24,5 +24,6 @@ return {
     'toVector',
     'trackingEntities',
     'values',
-    'vehProps'
+    'vehProps',
+    'setDefaultPedVariation'
 }
