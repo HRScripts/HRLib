@@ -11,7 +11,7 @@ HRLib.CreateCallback = function(name, isLocal, cb)
     HRLib.callbacks[name] = cb
 
     if not isHRLib and not isLocal then
-        TriggerEvent('__HRLib:LoadCallback', name, cb)
+        TriggerEvent('__HRLib:LoadCallback', false, name, cb, true)
     end
 end
 
@@ -146,11 +146,13 @@ end
 
 -- Events
 
-RegisterNetEvent(('__%s:LoadCallback'):format(resName), function(empty, key, value)
-    HRLib[isServer and 'clientCallbacks' or 'serverCallbacks'][key] = empty and nil or value
+RegisterNetEvent(('__%s:LoadCallback'):format(resName), function(empty, key, value, isLoadOtherScriptCallback)
+    HRLib[isLoadOtherScriptCallback and 'callbacks' or (isServer and 'clientCallbacks' or 'serverCallbacks')][key] = empty and nil or value
 
-    if HRLib.callbacksPromises[key] then
-        HRLib.callbacksPromises[key]:resolve(not empty)
+    if not isLoadOtherScriptCallback then
+        if HRLib.callbacksPromises[key] then
+            HRLib.callbacksPromises[key]:resolve(not empty)
+        end
     end
 end)
 
@@ -158,14 +160,16 @@ RegisterNetEvent(('__%s:SendCallback'):format(resName), function(name, ...)
     local source = source -- Preventing possible unfocusing from source by the callback function when server side
     local evName <const>, params = ('__%s:LoadCallback'):format(resName)
 
-    if type(HRLib.callbacks[name]) == 'function' or (type(HRLib.callbacks[name]) == 'table' and HRLib.callbacks[name]['__cfx_functionReference']) then
+    local callback <const> = HRLib.callbacks[name]
+    local isNil <const> = callback == nil
+    if type(callback) == 'function' or (type(callback) == 'table' and callback['__cfx_functionReference']) then
         if isServer then
-            params = { HRLib.callbacks[name] == nil, name, HRLib.callbacks[name] ~= nil and { HRLib.callbacks[name](source, ...) } or nil }
+            params = { isNil, name, not isNil and { callback(source, ...) } or nil }
         else
-            params = { HRLib.callbacks[name] == nil, name, HRLib.callbacks[name] ~= nil and { HRLib.callbacks[name](...) } or nil }
+            params = { isNil, name, not isNil and { callback(...) } or nil }
         end
     else
-        params = { HRLib.callbacks[name] == nil, name, HRLib.callbacks[name] ~= nil and { HRLib.callbacks[name] } or nil }
+        params = { isNil, name, not isNil and { callback } or nil }
     end
 
     if isServer then
