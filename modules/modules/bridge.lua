@@ -120,20 +120,6 @@ if serverSide then
         end
     end
 else
-    --TODO: in test period, test it
-    -- HRLib.bridge.playerData = setmetatable(HRLib.bridge.type == 'esx' and HRLib.bridge.framework.GetPlayerData() or HRLib.bridge.framework.Functions.GetPlayerData(), {
-    --     __index = function(self, k)
-    --         local playerData <const>, oldValue <const> = HRLib.bridge.type == 'esx' and HRLib.bridge.framework.GetPlayerData() or HRLib.bridge.framework.Functions.GetPlayerData(), rawget(self, k)
-    --         if type(playerData[k]) ~= 'table' and playerData[k] ~= oldValue or (type(playerData[k]) == 'table' and type(oldValue) == 'table') and not HRLib.table.compare(playerData[k], oldValue) then
-    --             rawset(self, k, playerData[k])
-
-    --             return playerData[k]
-    --         end
-
-    --         return rawget(self, k)
-    --     end
-    -- })
-
     ---@return table playerData
     HRLib.bridge.getPlayerData = function()
         if HRLib.bridge.type == 'esx' then
@@ -141,5 +127,24 @@ else
         elseif HRLib.bridge.type == 'qb' then
             return HRLib.bridge.framework.Functions.GetPlayerData()
         end ---@diagnostic disable-line: missing-return
+    end
+
+    ---@param cb function
+    HRLib.bridge.onPlSpawn = function(cb)
+        (HRLib.bridge.type == 'esx' and AddEventHandler or RegisterNetEvent)(HRLib.bridge.type == 'esx' and 'esx:onPlayerSpawn' or 'QBCore:Client:OnPlayerLoaded', function(...)
+            HRLib.bridge.isPlayerSpawned = true
+
+            if type(cb) == 'function' or type(cb) == 'table' and cb['__cfx_functionReference'] then
+                cb(...)
+            end
+        end)
+    end
+
+    HRLib.bridge.isPlayerLoaded = function()
+        return HRLib.bridge.type == 'esx' and HRLib.bridge.framework.IsPlayerLoaded() or LocalPlayer.state.isLoggedIn
+    end
+
+    if HRLib.bridge.isPlayerLoaded() then
+        HRLib.bridge.isPlayerSpawned = true
     end
 end
