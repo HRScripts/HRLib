@@ -60,7 +60,7 @@ if IsDuplicityVersion() then
             warn('The restarting/stopping of ^5hrlib^3 is not recommended! You may have error at our other scripts and the commands from the other resources will not be registered!')
         end
     end)
-elseif config.debug.enable == true then
+elseif config.debug.enable then
     HRLib.RegCommand(config.debug.commandName, function(args, rawCommand, IPlayer, FPlayer)
         local fnType = args[1]
         local paramsText = ''

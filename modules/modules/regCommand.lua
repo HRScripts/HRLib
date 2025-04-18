@@ -137,7 +137,7 @@ else
     HRLib.RegCommand = function(name, cb, suggestions)
         suggestions = type(suggestions) == 'table' and suggestions or {}
 
-        if not name or name == '' or type(name) ~= 'table' or type(name) == 'table' and table.type(name) ~= 'array' then
+        if type(name) ~= 'string' or name == '' or type(name) == 'table' and table.type(name) ~= 'array' then
             return warn(('^1%s^3 tried to register a client command ^1without^3 name!^0'):format(resName == 'HRLib' and GetInvokingResource() or resName))
         end
 
@@ -174,10 +174,8 @@ else
     end
 
     AddEventHandler('playerSpawned', function()
-        if NetworkIsPlayerActive(PlayerId()) or IsScreenFadedOut() then
-            while not NetworkIsPlayerActive(PlayerId()) or IsScreenFadedOut() do
-                Wait(100)
-            end
+        while not IsEntityOnScreen(PlayerPedId()) do
+            Wait(100)
         end
 
         TriggerServerEvent(('__%s:CommandsSuggestions'):format(resName))
