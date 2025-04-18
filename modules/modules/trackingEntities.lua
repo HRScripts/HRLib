@@ -126,6 +126,17 @@ if not IsDuplicityVersion() then
         return value
     end
 
+    ---@return { entity: integer }[]|false
+    HRLib.GetTrackedEntities = function()
+        local tE <const> = HRLib.table.deepclone(trackedEntities)
+
+        for i=1, #tE do
+            tE[i].threadId = nil
+        end
+
+        return #tE > 0 and tE
+    end
+
     ---Remove the tracker from the entity, created from HRLib.TrackEntity
     ---@param entityId integer
     HRLib.RemoveEntityTracker = function(entityId)
