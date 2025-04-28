@@ -3,6 +3,7 @@ return {
     'table',
     'resources',
     'createBlip',
+    'controlsDisable',
     'bridge',
     'callbacks',
     'closest',
