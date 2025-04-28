@@ -162,7 +162,7 @@ else
             )
         end
 
-        if name == 'string' then
+        if type(name) == 'string' then
             RegisterCommand(name, callback, false)
         else
             for i=1, #name do
@@ -182,7 +182,7 @@ else
 
         for k,v in pairs(HRLib.registeredCmds) do
             if type(v.suggestions) == 'table' and table.type(v.suggestions) ~= 'empty' then
-                TriggerEvent('chat:addSuggestion', ('/%s'):format(k), v.suggestions.help or '', (type(v.suggestion.args) == 'table' and table.type(v.suggestion.args) == 'array') and v.suggestion.args or {})
+                TriggerEvent('chat:addSuggestion', ('/%s'):format(k), v.suggestions.help or '', (type(v.suggestions.args) == 'table' and table.type(v.suggestions.args) == 'array') and v.suggestions.args or {})
             end
         end
     end)
