@@ -1,39 +1,52 @@
 const positions = {
-    'top-right': 10,
-    'center-right': 10,
-    'bottom-right': 10,
     'top-left': 10,
-    'left-center': 10,
+    'top-center': 10,
+    'top-right': 10,
+    'center-left': 10,
+    'center': 10,
+    'center-right': 10,
     'bottom-left': 10,
+    'bottom-center': 10,
+    'bottom-right': 10,
 };
 
 const setPosition = (notification, position) => {
     const curr = positions[position];
     const centerHeight = (Math.max(document.documentElement.clientHeight, window.innerHeight || 0) / 2) - (notification.outerHeight() / 2) + curr;
+    const centerWidth = (Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 2) - (notification[0].offsetWidth / 2);
     const offset = 10;
     let posCss = {};
 
     switch (position) {
+        case 'top-left':
+            posCss = { top: `${curr}px`, left: `${offset}px` };
+            break;
+        case 'top-center':
+            posCss = { top: `${curr}px`, left: `${centerWidth}px` };
+            break;
         case 'top-right':
             posCss = { top: `${curr}px`, right: `${offset}px` };
+            break;
+        case 'center-left':
+            posCss = { top: `${centerHeight}px`, left: `${offset}px` };
+            break;
+        case 'center':
+            posCss = { top: `${centerHeight}px`, left: `${centerWidth}px` };
             break;
         case 'center-right':
             posCss = { top: `${centerHeight}px`, right: `${offset}px` };
             break;
-        case 'bottom-right':
-            posCss = { bottom: `${curr}px`, right: `${offset}px` };
-            break;
-        case 'top-left':
-            posCss = { top: `${curr}px`, left: `${offset}px` };
-            break;
-        case 'left-center':
-            posCss = { top: `${centerHeight}px`, left: `${offset}px` };
-            break;
         case 'bottom-left':
             posCss = { bottom: `${curr}px`, left: `${offset}px` };
             break;
+        case 'bottom-center':
+            posCss = { bottom: `${curr}px`, left: `${centerWidth}px` };
+            break;
+        case 'bottom-right':
+            posCss = { bottom: `${curr}px`, right: `${offset}px` };
+            break;
         default:
-            console.log('Invalid position specified. Defaulting to top-right.');
+            console.log('Invalid position specified. Set to the default, top-right.');
             posCss = { top: `${positions['top-right']}px`, right: `${offset}px` };
             break;
     }

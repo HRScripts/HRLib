@@ -61,12 +61,12 @@ if IsDuplicityVersion() then
         end
     end)
 elseif config.debug.enable then
-    HRLib.RegCommand(config.debug.commandName, function(args, rawCommand, IPlayer, FPlayer)
+    HRLib.RegCommand(config.debug.commandName, function(args)
         local fnType = args[1]
         local paramsText = ''
 
         if #args > 1 then
-            for i=2, #args do
+            for i=2, fnType == 'notify' and #args-2 or #args do
                 paramsText = ('%s%s%s'):format(paramsText, i == 2 and '' or ' ', args[i])
             end
         end
@@ -113,7 +113,7 @@ elseif config.debug.enable then
                 print('You said:', result[1])
             end
         elseif fnType == 'notify' then
-            HRLib.Notify(paramsText or 'Test notification', HRLib.table.find({ 'success', 'error', 'info', 'warning' }, args[#args]) and args[#args] or ({ 'success', 'error', 'info', 'warning' })[math.random(1, 4)])
+            HRLib.Notify(paramsText or 'Test notification', HRLib.table.find({ 'success', 'error', 'info', 'warning' }, args[#args-1]) and args[#args-1] or ({ 'success', 'error', 'info', 'warning' })[math.random(1, 4)], 2500, HRLib.table.find({ 'top-left', 'top-center', 'top-right', 'center-left', 'center', 'center-right', 'bottom-left', 'bottom-center', 'bottom-right' }, args[#args]) and args[#args] or 'top-right')
         else
             print('Invalid debug type! The type must be in the exact way as in the description to use it')
         end
