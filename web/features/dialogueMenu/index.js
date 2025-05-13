@@ -40,28 +40,33 @@ window.addEventListener('message', (event) => {
                 $('.close-button').text(response.cancelLabel);
             }, 'json');
 
+            if (Array.isArray(data.questions)) {
+                data.questions.forEach(function(value, i) {
+                    if (value.type !== 'text' && value.type !== 'number') {
+                        console.error(`The entered type for ${i+1} option in created input dialogue is invalid!`);
+                        return;
+                    };
+
+                    const currQuestion = $(`<div class="input"><p class="input-description">${value.options.label}</p><input type="${value.type}" placeholder="${value.options.placeholder || ''}"></div>`);
+                    $('.inputs').append(currQuestion);
+                });
+            };
+
             ([ '.submit-button', '.close-button' ]).forEach(function(value) {
                 $(value).off('click').on('click', function() {
-                    let elements = Array.from(document.querySelectorAll('input'));
+                    const values = [];
 
-                    elements.forEach(function(value, index, parent) {
-                        parent[index] = value.value;
+                    Array.from($('.inputs').find('input')).forEach(function(value) {
+                        values.push(value.type === 'number' ? (typeof value.value !== 'number' ? Number(value.value) : value.value) : value.value);
                     });
 
-                    $.post('https://HRLib/closeDialogue', JSON.stringify({ dialogueType: 'input', type: value.includes('close') ? 'cancel' : 'agree', answers: value.includes('close') ? null : elements }));
+                    $.post('https://HRLib/closeDialogue', JSON.stringify({ dialogueType: 'input', type: value.includes('close') ? 'cancel' : 'agree', answers: value.includes('close') ? null : values }));
                     $('.input-title').text('');
                     $('.inputDialogue-menu').hide();
 
                     $('.inputs')[0].innerHTML = '';
                 });
             });
-
-            if (Array.isArray(data.questions)) {
-                data.questions.forEach(function(value) {
-                    const currQuestion = $(`<div class="input"><p class="input-description">${value.options.label}</p><input type="text" placeholder="${value.options.placeholder || ''}"></div>`);
-                    $('.inputs').append(currQuestion);
-                });
-            };
 
             break;
         default:

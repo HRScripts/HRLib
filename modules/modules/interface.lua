@@ -8,7 +8,7 @@ if isServer then
     ---@param description string? notification content
     ---@param type 'success'|'error'|'warning'|'info'? notification type
     ---@param duration integer? notification duration in msec, default is 2500
-    ---@param pos 'top-right'|'center-right'|'bottom-right'|'frombelow-right'|'top-left'|'left-center'|'frombelow-left'? notification position, default is found in HRLib/config.lua
+    ---@param pos 'top-left'|'top-center'|'top-right'|'center-left'|'center'|'center-right'|'bottom-left'|'bottom-center'|'bottom-right'? notification position, default is found in HRLib/config.lua
     ---@param sound boolean?
     HRLib.Notify = function(playerId, description, type, duration, pos, sound)
         TriggerClientEvent('HRLib:Notify', playerId, description, type, duration, pos, sound)
@@ -112,7 +112,7 @@ else
         end
     end
 
-    ---@param options { title: string, questions: { type: 'text', options: HRLibInputDialogueTextOptions }[], onCancel: function? }
+    ---@param options { title: string, questions: { type: 'text'|'number', options: HRLibInputDialogueTextOptions }[], onCancel: function? }
     ---@return string[]?
     HRLib.createInputDialogue = function(options)
         if table.type(currentAlertDialogue) == 'empty' and table.type(currentInputDialogue) == 'empty' then
@@ -131,7 +131,7 @@ else
             SetNuiFocus(true, true)
             Citizen.Await(currentInputDialogue.promise)
 
-            local value <const> = currentInputDialogue.promise.value == 'table' and HRLib.table.deepclone(currentInputDialogue.promise.value) or currentInputDialogue.promise.value
+            local value <const> = type(currentInputDialogue.promise.value) == 'table' and HRLib.table.deepclone(currentInputDialogue.promise.value)
 
             currentInputDialogue = {}
 
@@ -145,7 +145,7 @@ else
     ---@param description string? notification content
     ---@param type 'success'|'error'|'warning'|'info'? notification type
     ---@param duration integer? notification duration in msec, default is 2500
-    ---@param pos 'top-right'|'center-right'|'bottom-right'|'frombelow-right'|'top-left'|'left-center'|'frombelow-left'? notification position, default is found in HRLib/config.lua
+    ---@param pos 'top-left'|'top-center'|'top-right'|'center-left'|'center'|'center-right'|'bottom-left'|'bottom-center'|'bottom-right'? notification position, default is found in HRLib/config.lua
     ---@param sound boolean?
     HRLib.Notify = function(description, type, duration, pos, sound)
         if not type or not string.find('successerrorwarninginfo', type, nil, true) then
@@ -156,7 +156,7 @@ else
             duration = 1500
         end
 
-        if pos and not string.find('top-rightcenter-rightbottom-rightfrombelow-righttop-leftleft-centerfrombelow-left', pos or 'left-center', nil, true) or not pos then
+        if _G.type(pos) ~= 'string' or not string.find('top-lefttop-centertop-rightcenter-leftcentercenter-rightbottom-leftbottom-centerbottom-right', pos or 'left-center', nil, true) then
             pos = config.defaultNotificationsPosition
         end
 
@@ -189,14 +189,14 @@ else
 
         if data.dialogueType == 'alert' then
             local currentFunction <const> = currentAlertDialogue[data.type == 'cancel' and 'onCancel' or 'onAgree']
-            if type(currentFunction) == 'function' then
+            if type(currentFunction) == 'function' or type(currentFunction) == 'table' and currentFunction.__cfx_functionReference then
                 currentFunction()
             end
 
             currentAlertDialogue = {}
         elseif data.dialogueType == 'input' then
             if data.type == 'cancel' then
-                if type(currentInputDialogue.onCancel) == 'function' then
+                if type(currentInputDialogue.onCancel) == 'function' or type(currentInputDialogue.onCancel) == 'table' and currentInputDialogue.onCancel.__cfx_functionReference then
                     currentInputDialogue.onCancel()
                 end
 
