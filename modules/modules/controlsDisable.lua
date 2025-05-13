@@ -54,8 +54,8 @@ HRLib.cDisable.doesProcessExist = function(processId)
     return HRLib.table.find(disabledKeysCmds, { processId = processId })
 end
 
----@return { key: string|string[], processId: any }[]?
-HRLib.cDisable.getAllProcesses = function()
+---@return { key: string|string[], processId: any }[]? processes
+HRLib.cDisable.getProcesses = function()
     if #disabledKeysCmds > 0 then
         local copy <const> = HRLib.table.deepclone(disabledKeysCmds)
 
@@ -67,7 +67,8 @@ HRLib.cDisable.getAllProcesses = function()
     end
 end
 
----@return boolean? # success or not
+---@param processId any
+---@return boolean? success contains whether or not the removal is successful
 HRLib.cDisable.removeProcess = function(processId)
     if not processId then return end
 
