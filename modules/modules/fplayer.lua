@@ -55,7 +55,7 @@ if isServer then
     ---@param description string content of the notice
     ---@param type 'success'|'error'|'info'|'warning' notification type
     ---@param duration number? notification duration in msec, default is 2500
-    ---@param pos 'top-right'|'center-right'|'bottom-right'|'frombelow-right'|'top-left'|'left-center'|'frombelow-left'?
+    ---@param pos 'top-left'|'top-center'|'top-right'|'center-left'|'center'|'center-right'|'bottom-left'|'bottom-center'|'bottom-right'?
     ---@param sound boolean? default is true
     function fplayer:Notify(description, type, duration, pos, sound)
         HRLib.Notify(self.id, description, type, duration, pos, sound)

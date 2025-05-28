@@ -39,7 +39,9 @@ if IsDuplicityVersion() then
         end
     end
 
-    RegisterNetEvent('__HRLib:StopMyself', function(resourceName, msgtype, msg)
+    exports('StopMyself', function(resourceName, msgtype, msg)
+        if resourceName == 'HRLib' or GetResourceState(resourceName) ~= 'started' then return end
+
         Wait(1000)
 
         if msgtype == 'warn' or msgtype == 'error' and type(msg) == 'string' then
@@ -47,6 +49,20 @@ if IsDuplicityVersion() then
         end
 
         StopResource(resourceName)
+    end)
+
+    exports('RestartMyself', function(resourceName, msgtype, msg)
+        if resourceName == 'HRLib' or GetResourceState(resourceName) ~= 'started' then return end
+
+        Wait(1000)
+
+        if msgtype == 'warn' or msgtype == 'error' and type(msg) == 'string' then
+            (msgtype == 'warn' and warn or error)(('%s: %s'):format(resourceName, msg))
+        end
+
+        StopResource(resourceName)
+        Wait(100)
+        StartResource(resourceName)
     end)
 
     AddEventHandler('onResourceStart', function(resource)

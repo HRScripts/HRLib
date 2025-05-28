@@ -166,7 +166,7 @@ else
         if type(cb) ~= 'function' or (type(cb) == 'table' and not cb['__cfx_functionReference']) then return end
 
         AddEventHandler('playerConnecting', function(...)
-            cb(source, ...)
+            cb(tonumber(source) --[[@as integer]], ...)
         end)
     end
 
@@ -191,7 +191,13 @@ else
     ---@param msgtype 'warn'|'error'
     ---@param msg string
     HRLib.StopMyself = function(msgtype, msg)
-        TriggerEvent('__HRLib:StopMyself', GetCurrentResourceName(), msgtype, msg)
+        exports.HRLib:StopMyself(GetCurrentResourceName(), msgtype, msg)
+    end
+
+    ---@param msgtype 'warn'|'error'
+    ---@param msg string
+    HRLib.RestartMyself = function(msgtype, msg)
+        exports.HRLib:RestartMyself(GetCurrentResourceName(), msgtype, msg)
     end
 
     ---@param resName string|'any'? string the resource name or nil for the current one
