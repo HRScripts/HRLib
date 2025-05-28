@@ -26,5 +26,6 @@ return {
     'trackingEntities',
     'values',
     'vehProps',
-    'setDefaultPedVariation'
+    'setDefaultPedVariation',
+    'getServerInfo'
 }
