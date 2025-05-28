@@ -159,19 +159,20 @@ HRLib.table.find = function(tbl, value, returnIndex, isValueKey, returnUnderInde
 end
 
 ---@param tbl table
+---@param dontCopyMetatable boolean? if the table you provide has metatable with this, set to true you can choose to not copy the metatable too
 ---@return table
-HRLib.table.deepclone = function(tbl)
+HRLib.table.deepclone = function(tbl, dontCopyMetatable)
     local table = {}
 
     for k,v in pairs(tbl) do
-        table[k] = type(v) == 'table' and HRLib.table.deepclone(v) or v
+        table[k] = type(v) == 'table' and HRLib.table.deepclone(v, dontCopyMetatable) or v
     end
 
-    if getmetatable(tbl) then
+    if getmetatable(tbl) and not dontCopyMetatable then
         local mtbl = {}
 
         for k,v in pairs(getmetatable(tbl)) do
-            mtbl[k] = type(v) == 'table' and HRLib.table.deepclone(v) or v
+            mtbl[k] = type(v) == 'table' and HRLib.table.deepclone(v, dontCopyMetatable) or v
         end
 
         setmetatable(table, mtbl)
