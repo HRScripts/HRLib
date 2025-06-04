@@ -188,22 +188,20 @@ else
         end)
     end
 
-    ---@param msgtype 'warn'|'error'
-    ---@param msg string
+    ---@param msgtype 'warn'|'error'?
+    ---@param msg string?
     HRLib.StopMyself = function(msgtype, msg)
         exports.HRLib:StopMyself(GetCurrentResourceName(), msgtype, msg)
     end
 
-    ---@param msgtype 'warn'|'error'
-    ---@param msg string
+    ---@param msgtype 'warn'|'error'?
+    ---@param msg string?
     HRLib.RestartMyself = function(msgtype, msg)
         exports.HRLib:RestartMyself(GetCurrentResourceName(), msgtype, msg)
     end
 
     ---@param resName string|'any'? string the resource name or nil for the current one
     ---@param cb fun(resource: string)
-    ---@changelog version 1.0.0
-    ---@version 1.0.0
     HRLib.OnServerStart = function(resName, cb)
         resName = resName or GetCurrentResourceName()
 
