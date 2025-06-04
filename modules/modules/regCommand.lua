@@ -150,14 +150,10 @@ else
         TriggerEvent('chat:addSuggestion', ('/%s'):format(name), suggestions.help or '', (type(suggestions.args) == 'table' and table.type(suggestions.args) == 'array') and suggestions.args or {})
 
         local callback = function(_, args, rawCommand)
-            local IPlayer <const> = HRLib.GetIPlayer(GetPlayerServerId(PlayerId())) --[[@as HRLibClientIPlayer]]
-
-            if not IPlayer then return end
-
             cb(
                 args,
                 rawCommand,
-                IPlayer,
+                HRLib.GetIPlayer(),
                 HRLib.GetFPlayer() --[[@as HRLibClientFPlayer]]
             )
         end
