@@ -1,5 +1,7 @@
 ---@param ped integer
 HRLib.SetDefaultPedVariation = function(ped)
+    if not DoesEntityExist(ped) then return end
+
     SetPedComponentVariation(ped, 0, 0, 0, 2)
     SetPedComponentVariation(ped, 1, 0, 0, 2)
     SetPedComponentVariation(ped, 2, 0, 0, 2)
