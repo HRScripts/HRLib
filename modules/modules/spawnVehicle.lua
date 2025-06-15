@@ -6,7 +6,7 @@ local isServer <const> = IsDuplicityVersion()
 HRLib.SpawnVehicle = function(vehModel, coords)
     local modelHash <const> = type(vehModel) == 'number' and vehModel or joaat(vehModel)
 
-    if type(coords) ~= 'vector4' or (isServer and type(modelHash) ~= 'number' or not IsModelValid(modelHash)) then return end
+    if type(coords) ~= 'vector4' or (isServer and type(modelHash) ~= 'number' or (not isServer and not IsModelValid(modelHash))) then return end
 
     if not isServer then
         RequestModel(modelHash)

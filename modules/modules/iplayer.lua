@@ -132,7 +132,7 @@ else
             __index = function(self, k)
                 local ped <const> = GetPlayerPed(p)
                 if k == 'ped' then
-                    return GetPlayerPed(ped)
+                    return ped
                 elseif k == 'coords' or k == 'coordinates' then
                     return GetEntityCoords(ped)
                 elseif k == 'heading' then
