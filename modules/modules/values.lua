@@ -28,7 +28,7 @@ if not IsDuplicityVersion() then
     end
 
     HRLib.VehicleModels = setmetatable(allVehiclesModels, {
-        __call = function(self, ...)
+        __call = function(self)
             local vehicleModels <const> = GetAllVehicleModels()
             for i=1, #vehicleModels do
                 rawset(self, joaat(vehicleModels[i]), vehicleModels[i])

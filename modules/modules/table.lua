@@ -181,7 +181,8 @@ HRLib.table.deepclone = function(tbl, dontCopyMetatable)
     return table
 end
 
----@param bagName string
+---Clones a state bag with table value and returns only the table with all the keys from the table
+---@param bagName string Full state bag name
 ---@return any[]|false
 HRLib.table.cloneStateBag = function(bagName)
     local keys <const>, values <const> = GetStateBagKeys(bagName), {}
