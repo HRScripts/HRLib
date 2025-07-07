@@ -27,5 +27,6 @@ return {
     'values',
     'vehProps',
     'setDefaultPedVariation',
-    'getServerInfo'
+    'getServerInfo',
+    'time'
 }

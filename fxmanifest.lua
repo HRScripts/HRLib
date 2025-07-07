@@ -6,7 +6,7 @@ name 'HRLib'
 author 'HRScripts Development'
 description 'A fivem library script used for each HRScripts\' resource'
 repository 'https://github.com/HRScripts/HRLib'
-version '3.1.7'
+version '3.2.0'
 
 shared_script 'main.lua'
 
@@ -21,3 +21,5 @@ files {
 }
 
 ui_page 'web/index.html'
+
+dependency '/onesync'
