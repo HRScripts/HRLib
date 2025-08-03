@@ -81,3 +81,25 @@ HRLib.RequestAnimDict = function(dict)
         end
     end
 end
+
+---@param name string|string[]
+HRLib.RequestPTFX = function(name)
+    name = type(name) == 'table' and name or type(name) == 'string' and { name } --[[@as string[] ]]
+    if name then
+        for i=1, #name do
+            local curr <const> = name[i]
+
+            RequestNamedPtfxAsset(curr)
+
+            local timesChecked = 0
+
+            repeat if timesChecked >= 100 then break end Wait(25) until HasNamedPtfxAssetLoaded(curr)
+
+            if timesChecked == 100 and not HasNamedPtfxAssetLoaded(curr) then
+                return
+            end
+        end
+    else
+        warn('Failed to request an invalid PTFX asset!')
+    end
+end
