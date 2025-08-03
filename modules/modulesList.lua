@@ -18,7 +18,7 @@ return {
     'interface',
     'iplayer',
     'playerIdentifiers',
-    'RandomValueWithNoRepetition',
+    'randomValueWithNoRepetition',
     'regCommand',
     'spawnVehicle',
     'streaming',
@@ -29,4 +29,5 @@ return {
     'setDefaultPedVariation',
     'getServerInfo',
     'time'
+
 }
