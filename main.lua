@@ -39,27 +39,23 @@ if IsDuplicityVersion() then
         end
     end
 
-    exports('StopMyself', function(resourceName, msgtype, msg)
-        if resourceName == 'HRLib' or GetResourceState(resourceName) ~= 'started' then return end
-
-        Wait(1000)
-
-        if msgtype == 'warn' or msgtype == 'error' and type(msg) == 'string' then
-            (msgtype == 'warn' and warn or error)(('%s: %s'):format(resourceName, msg))
+    RegisterNetEvent('HRLib:StopMyself', function()
+        if HRLib.DoesIdExist(source) then
+            return warn(('The player %s with %s id tried to execute very dangerous event!\nIt\'s most probably a modder!'):format(GetPlayerName(source), source))
         end
 
-        StopResource(resourceName)
+        Wait(100)
+        StopResource(GetInvokingResource())
     end)
 
-    exports('RestartMyself', function(resourceName, msgtype, msg)
-        if resourceName == 'HRLib' or GetResourceState(resourceName) ~= 'started' then return end
-
-        Wait(1000)
-
-        if msgtype == 'warn' or msgtype == 'error' and type(msg) == 'string' then
-            (msgtype == 'warn' and warn or error)(('%s: %s'):format(resourceName, msg))
+    RegisterNetEvent('HRLib:RestartMyself', function()
+        if HRLib.DoesIdExist(source) then
+            return warn(('The player %s with %s id tried to execute very dangerous event!\nIt\'s most probably a modder!'):format(GetPlayerName(source), source))
         end
 
+        local resourceName <const> = GetInvokingResource()
+
+        Wait(100)
         StopResource(resourceName)
         Wait(100)
         StartResource(resourceName)

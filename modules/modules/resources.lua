@@ -44,12 +44,11 @@ end
 require = HRLib.require
 
 ---@param resName string|'any'? string the resource name or nil for the current one
----@param cb function
+---@param cb fun(resName: string)
 HRLib.OnStop = function(resName, cb)
     if type(cb) ~= 'function' or (type(cb) == 'table' and not cb['__cfx_functionReference']) then return end
 
-    resName = resName or GetCurrentResourceName()
-
+    resName = resName or res
     AddEventHandler('onResourceStop', function(resource)
         if resource == resName then
             cb(resource)
@@ -61,7 +60,7 @@ end
 
 if not isServer then
     ---@param resName string|'any' string the resource name or nil for the current one
-    ---@param cb function
+    ---@param cb fun(resName: string)
     HRLib.OnStart = function(resName, cb)
         if type(cb) ~= 'function' or (type(cb) == 'table' and not cb['__cfx_functionReference']) then return end
 
@@ -75,7 +74,7 @@ if not isServer then
     end
 
     ---@param resName string|'any' string the resource name or nil for the current one
-    ---@param cb function
+    ---@param cb fun(resName: string)
     HRLib.OnStarting = function(resName, cb)
         if type(cb) ~= 'function' or (type(cb) == 'table' and not cb['__cfx_functionReference']) then return end
 
@@ -123,11 +122,11 @@ if not isServer then
     end
 else
     ---@param resName string|'any'? string the resource name or nil for the current one
-    ---@param cb function
+    ---@param cb fun(resName: string)
     HRLib.OnStart = function(resName, cb)
         if type(cb) ~= 'function' or (type(cb) == 'table' and not cb['__cfx_functionReference']) then return end
 
-        resName = resName or GetCurrentResourceName()
+        resName = resName or res
 
         AddEventHandler('onResourceStart', function(resource)
             if resource == resName then
@@ -139,11 +138,11 @@ else
     end
 
     ---@param resName string|'any'? string the resource name or nil for the current one
-    ---@param cb function
+    ---@param cb fun(resName: string)
     HRLib.OnStarting = function(resName, cb)
         if type(cb) ~= 'function' or (type(cb) == 'table' and not cb['__cfx_functionReference']) then return end
 
-        resName = resName or GetCurrentResourceName()
+        resName = resName or res
 
         AddEventHandler('onResourceStarting', function(resource)
             if resource == resName then
@@ -191,19 +190,27 @@ else
     ---@param msgtype 'warn'|'error'?
     ---@param msg string?
     HRLib.StopMyself = function(msgtype, msg)
-        exports.HRLib:StopMyself(GetCurrentResourceName(), msgtype, msg)
+        TriggerEvent('HRLib:StopMyself')
+
+        if msg and msgtype and (msgtype == 'warn' or msgtype == 'error') then
+            _G[msgtype](msg)
+        end
     end
 
     ---@param msgtype 'warn'|'error'?
     ---@param msg string?
     HRLib.RestartMyself = function(msgtype, msg)
-        exports.HRLib:RestartMyself(GetCurrentResourceName(), msgtype, msg)
+        TriggerEvent('HRLib:RestartMyself')
+
+        if msg and msgtype and (msgtype == 'warn' or msgtype == 'error') then
+            _G[msgtype](msg)
+        end
     end
 
     ---@param resName string|'any'? string the resource name or nil for the current one
     ---@param cb fun(resource: string)
     HRLib.OnServerStart = function(resName, cb)
-        resName = resName or GetCurrentResourceName()
+        resName = resName or res
 
         AddEventHandler('onServerResourceStart', function(resource)
             if resource == resName then
@@ -217,7 +224,7 @@ else
     ---@param resName string|'any'? string the resource name or nil for the current one
     ---@param cb fun(resource: string)
     HRLib.OnServerStop = function(resName, cb)
-        resName = resName or GetCurrentResourceName()
+        resName = resName or res
 
         AddEventHandler('onServerResourceStop', function(resource)
             if resource == resName then
