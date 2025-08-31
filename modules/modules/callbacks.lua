@@ -24,7 +24,7 @@ if isServer then
         local callback = HRLib.callbacks[name]
 
         if callback == nil then
-            if resName ~= 'HRLib' then
+            if not isHRLib then
                 HRLib.callbacksPromises[name] = promise.new()
 
                 TriggerEvent('__HRLib:TransferCallback', resName, 'client', name)
@@ -59,7 +59,7 @@ if isServer then
 
         callback = HRLib.clientCallbacks[name]
 
-        if callback == nil and resName ~= 'HRLib' then
+        if callback == nil and not isHRLib then
             TriggerClientEvent('__HRLib:TransferCallback', HRLib.DoesIdExist(playerId --[[@as integer]]) and playerId or -1, resName, 'server', name, ...)
             Citizen.Await(HRLib.callbacksPromises[name])
 
@@ -67,7 +67,7 @@ if isServer then
         end
 
         if callback == nil then
-            warn(resName == 'HRLib' and ('Resource ^2%s^3 tried to use non-existent client callback!'):format(GetInvokingResource()) or 'This resource tried to use non-existent client callback!')
+            warn(isHRLib and ('Resource ^2%s^3 tried to use non-existent client callback!'):format(GetInvokingResource()) or 'This resource tried to use non-existent client callback!')
 
             return
         end
@@ -82,7 +82,7 @@ else
         local callback = HRLib.callbacks[name]
 
         if callback == nil then
-            if resName ~= 'HRLib' then
+            if not isHRLib then
                 HRLib.callbacksPromises[name] = promise.new()
 
                 TriggerEvent('__HRLib:TransferCallback', resName, 'client', name)
@@ -109,35 +109,22 @@ else
     HRLib.ServerCallback = function(name, ...)
         HRLib.callbacksPromises[name] = promise.new()
 
-        local callback
+        TriggerServerEvent(('__%s:SendCallback'):format(resName), name, ...)
+        Citizen.Await(HRLib.callbacksPromises[name])
 
-        if resName == 'HRLib' then
-            TriggerServerEvent('__HRLib:SendCallback', name, ...)
-            Citizen.Await(HRLib.callbacksPromises[name])
+        local callback = HRLib.serverCallbacks[name]
 
-            callback = HRLib.serverCallbacks[name]
-
-            if callback == nil then return end
-        else
-            TriggerServerEvent(('__%s:SendCallback'):format(resName), name, ...)
-            Citizen.Await(HRLib.callbacksPromises[name])
-
-            callback = HRLib.serverCallbacks[name]
-
-            if callback == nil then
+        if callback == nil then
+            if not isHRLib then
                 TriggerServerEvent('__HRLib:TransferCallback', resName, 'client', name, ...)
                 Citizen.Await(HRLib.callbacksPromises[name])
 
                 callback = HRLib.serverCallbacks[name]
-
-                if callback == nil then return end
             end
-        end
 
-        if callback == nil then
-            warn(resName == 'HRLib' and ('Resource ^2%s^3 tried to use non-existent client callback!'):format(GetInvokingResource()) or 'This resource tried to use non-existent client callback!')
-
-            return
+            if callback == nil then
+                return warn(isHRLib and ('Resource ^2%s^3 tried to use non-existent client callback (%s)!'):format(GetInvokingResource(), name) or ('This resource tried to use non-existent client callback (%s)!'):format(name))
+            end
         end
 
         return table.unpack(callback)
@@ -148,7 +135,6 @@ end
 
 RegisterNetEvent(('__%s:LoadCallback'):format(resName), function(empty, key, value, isLoadOtherScriptCallback)
     HRLib[isLoadOtherScriptCallback and 'callbacks' or (isServer and 'clientCallbacks' or 'serverCallbacks')][key] = empty and nil or value
-
     if not isLoadOtherScriptCallback then
         if HRLib.callbacksPromises[key] then
             HRLib.callbacksPromises[key]:resolve(not empty)
@@ -156,52 +142,39 @@ RegisterNetEvent(('__%s:LoadCallback'):format(resName), function(empty, key, val
     end
 end)
 
-RegisterNetEvent(('__%s:SendCallback'):format(resName), function(name, ...)
-    local source = source -- Preventing possible unfocusing from source by the callback function when server side
-    local evName <const>, params = ('__%s:LoadCallback'):format(resName)
+if isServer then
+    RegisterNetEvent(('__%s:SendCallback'):format(resName), function(name, ...)
+        local source, params = source, nil
+        local callback <const> = HRLib.callbacks[name]
 
-    local callback <const> = HRLib.callbacks[name]
-    local isNil <const> = callback == nil
-    if type(callback) == 'function' or (type(callback) == 'table' and callback['__cfx_functionReference']) then
-        if isServer then
-            params = { isNil, name, not isNil and { callback(source, ...) } or nil }
+        if callback ~= nil then
+            params = (type(callback) == 'function' or (type(callback) == 'table' and callback['__cfx_functionReference'])) and { false, name, { callback(source, ...) } } or { false, name, { callback } }
         else
-            params = { isNil, name, not isNil and { callback(...) } or nil }
+            params = { true, name, nil }
         end
-    else
-        params = { isNil, name, not isNil and { callback } or nil }
-    end
 
-    if isServer then
-        TriggerClientEvent(evName, source, table.unpack(params))
-    else
-        TriggerServerEvent(evName, table.unpack(params))
-    end
-end)
+        TriggerClientEvent(('__%s:LoadCallback'):format(resName), source, table.unpack(params))
+    end)
+else
+    RegisterNetEvent(('__%s:SendCallback'):format(resName), function(name, ...)
+        local params
+        local callback <const> = HRLib.callbacks[name]
+
+        if callback ~= nil then
+            params = (type(callback) == 'function' or (type(callback) == 'table' and callback['__cfx_functionReference'])) and { false, name, { callback(...) } } or { false, name, { callback } }
+        else
+            params = { true, name, nil }
+        end
+
+        TriggerServerEvent(('__%s:LoadCallback'):format(resName), table.unpack(params))
+    end)
+end
 
 if isHRLib then
     RegisterNetEvent('__HRLib:TransferCallback', function(resource, side, name, ...)
-        if isServer then
-            if type(HRLib.callbacks[name]) == 'function' or (type(HRLib.callbacks[name]) == 'table' and HRLib.callbacks[name]['__cfx_functionReference']) then
-                if side == 'client' then
-                    TriggerClientEvent(('__%s:LoadHRLibCallback'):format(resource), source, HRLib.callbacks[name] == nil, name, HRLib.callbacks[name] ~= nil and table.pack(HRLib.callbacks[name](...)) or nil)
-                else
-                    TriggerEvent(('__%s:LoadHRLibCallback'):format(resource), HRLib.callbacks[name] == nil, name, HRLib.callbacks[name] ~= nil and table.pack(HRLib.callbacks[name](...)) or nil)
-                end
-            else
-                if side == 'client' then
-                    TriggerClientEvent(('__%s:LoadHRLibCallback'):format(resource), source, HRLib.callbacks[name] == nil, name, HRLib.callbacks[name] ~= nil and table.pack(HRLib.callbacks[name]) or nil)
-                else
-                    TriggerEvent(('__%s:LoadHRLibCallback'):format(resource), HRLib.callbacks[name] == nil, name, HRLib.callbacks[name] ~= nil and table.pack(HRLib.callbacks[name]) or nil)
-                end
-            end
-        else
-            local triggerEvent <const> = side == 'server' and TriggerServerEvent or TriggerEvent
-            if type(HRLib.callbacks[name]) == 'function' or (type(HRLib.callbacks[name]) == 'table' and HRLib.callbacks[name]['__cfx_functionReference']) then
-                triggerEvent(('__%s:LoadHRLibCallback'):format(resource), HRLib.callbacks[name] == nil, name, HRLib.callbacks[name] ~= nil and table.pack(HRLib.callbacks[name](...)) or nil)
-            else
-                triggerEvent(('__%s:LoadHRLibCallback'):format(resource), HRLib.callbacks[name] == nil, name, HRLib.callbacks[name] ~= nil and table.pack(HRLib.callbacks[name]) or nil)
-            end
-        end
+        local evName <const>, isClient <const> = ('__%s:LoadHRLibCallback'):format(resource), side == 'client'
+        local params <const> = (type(HRLib.callbacks[name]) == 'function' or (type(HRLib.callbacks[name]) == 'table' and HRLib.callbacks[name]['__cfx_functionReference'])) and { source, HRLib.callbacks[name] == nil, name, HRLib.callbacks[name] ~= nil and table.pack(HRLib.callbacks[name](...)) or nil } or { source, HRLib.callbacks[name] == nil, name, HRLib.callbacks[name] ~= nil and table.pack(HRLib.callbacks[name]) or nil }
+        local triggerFn <const> = _G[isServer and (isClient and 'TriggerClientEvent' or 'TriggerEvent') or (isClient and 'TriggerEvent' or 'TriggerServerEvent')] --[[@as function]]
+        triggerFn(evName, table.unpack(params, (isServer and isClient) and nil or 2))
     end)
 end
