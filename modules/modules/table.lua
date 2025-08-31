@@ -254,3 +254,60 @@ HRLib.table.getKeys = function(tbl, isArray)
         end
     end
 end
+
+---Function to return the actual string equivalent of a table
+---@param tbl table
+---@param indent boolean? Whether or not return the table with all the spaces and new roles in the string
+---@param rowsSpace integer? The number of new rows before the next value in the table is declared in the string (Default value: 1).<br>This only matters when `indent` param is set to `true`
+---@return string?
+HRLib.table.toString = function(tbl, indent, rowsSpace)
+    if type(tbl) ~= 'table' then return end
+
+    if table.type(tbl) == 'empty' then
+        return '{}'
+    end
+
+    rowsSpace = (type(rowsSpace) == 'number' and math.tointeger(rowsSpace)) and rowsSpace or 1
+
+    local gapText <const> = '    '
+    local tableToString = function(self, target, gap_times)
+        local newRowAddition <const> = indent and ('%s%s'):format(('\n'):rep(rowsSpace), gapText:rep(gap_times)) or ' '
+        local tableText = '{'
+        for k,v in pairs(target) do
+            local vString, isVStringWholeText
+            if type(v) == 'function' then
+                --TODO: This method:
+                -- local info <const> = debug.getinfo(v, "S")
+                -- if info.source:sub(1,1) == "@" then
+                --     local file <const> = io.open(info.source:sub(2), "r")
+                --     if file then
+                --         local lines = {}
+
+                --         for line in file:lines() do table.insert(lines, line) end
+
+                --         file:close()
+
+                --         vString = table.concat(lines, "\n", info.linedefined, info.lastlinedefined)
+                --         isVStringWholeText = true
+                --     else
+                --         error('Not good happened!')
+                --     end
+                -- end
+                return error('HRLib.table.toString can\'t handle functions in a table!', 0)
+            else
+                vString = type(v) == 'table' and (table.type(v) == 'empty' and '{}' or self(self, v, gap_times + 1)) or (type(v) == 'string' and ('\'%s\''):format(v) or v)
+            end
+
+            if type(k) == 'string' then
+                tableText = isVStringWholeText and ('%s%s%s%s'):format(tableText, indent and '\n' or '', indent and vString or vString:gsub('\n', ' '), vString:sub(#vString) ~= ',' and ',' or '') or (k:match("^[%a_][%w_]*$") and '%s%s%s = %s,' or '%s%s[\'%s\'] = %s,'):format(tableText, newRowAddition, k, vString)
+            else
+                tableText = ('%s%s%s,'):format(tableText, newRowAddition, vString)
+            end
+        end
+
+        tableText = tableText:sub(1, #tableText-1)
+        return ('%s%s}'):format(tableText, indent and ('%s%s'):format(('\n'):rep(rowsSpace), gapText:rep(gap_times-1)) or ' ')
+    end
+
+    return tableToString(tableToString, tbl, 1)
+end
