@@ -101,11 +101,24 @@ if serverSide then
     ---@param account 'cash'|'bank'
     ---@param amount integer
     HRLib.bridge.setMoney = function(playerId, account, amount)
-        if HRLib.DoesIdExist(playerId) then
+        if HRLib.DoesIdExist(playerId) and (account == 'cash' or account == 'bank') and type(amount) == 'number' then
             if HRLib.bridge.type == 'esx' then
                 framework.GetPlayerFromId(playerId)?.setAccountMoney(account == 'cash' and 'money' or account, amount)
             elseif HRLib.bridge.type == 'qb' then
                 framework.Functions.GetPlayer(playerId)?.Functions.SetMoney(account, amount)
+            end
+        end
+    end
+
+    ---@param playerId integer
+    ---@param account 'cash'|'bank'
+    ---@param amount integer
+    HRLib.bridge.giveMoney = function(playerId, account, amount)
+        if HRLib.DoesIdExist(playerId) and (account == 'cash' or account == 'bank') and type(amount) == 'number' then
+            if HRLib.bridge.type == 'esx' then
+                framework.GetPlayerFromId(playerId)?.addAccountMoney(account == 'cash' and 'money' or account, amount)
+            elseif HRLib.bridge.type == 'qb' then
+                framework.Functions.GetPlayer(playerId)?.Functions.AddMoney(account, amount)
             end
         end
     end
@@ -118,6 +131,24 @@ if serverSide then
         if account == 'cash' or account == 'bank' and type(amount) == 'number' then
             HRLib.bridge.setMoney(playerId, account, HRLib.bridge.getMoney(playerId, account) - math.tointeger(amount))
         end
+    end
+
+    ---@param jobName string
+    ---@param jobGrade string?
+    ---@return boolean
+    HRLib.bridge.doesJobExist = function(jobName, jobGrade)
+        if HRLib.bridge.type == 'esx' then
+            return framework.DoesJobExist(jobName, jobGrade or 0)
+        elseif HRLib.bridge.type == 'qb' then
+            local found <const>, index <const> = HRLib.table.find(framework.Shared.Jobs, jobName, true, true)
+            if found and jobGrade then
+                return framework.Shared.Jobs[index].grades[tostring(jobGrade)] ~= nil
+            elseif found then
+                return true
+            end
+        end
+
+        return false
     end
 else
     ---@return table playerData
