@@ -25,6 +25,10 @@ if isServer then
 
         if callback == nil then
             if not isHRLib then
+                if HRLib.callbacksPromises[name] and (HRLib.callbacksPromises[name] --[[@as promise]]).state ~= 3 then
+                    Citizen.Await(HRLib.callbacksPromises[name])
+                end
+
                 HRLib.callbacksPromises[name] = promise.new()
 
                 TriggerEvent('__HRLib:TransferCallback', resName, 'client', name)
@@ -50,6 +54,10 @@ if isServer then
     ---@param ... any?
     ---@return ...|any?
     HRLib.ClientCallback = function(name, playerId, ...)
+        if HRLib.callbacksPromises[name] and (HRLib.callbacksPromises[name] --[[@as promise]]).state ~= 3 then
+            Citizen.Await(HRLib.callbacksPromises[name])
+        end
+
         HRLib.callbacksPromises[name] = promise.new()
 
         local callback
@@ -107,6 +115,10 @@ else
     ---@param ... any
     ---@return ...|any?
     HRLib.ServerCallback = function(name, ...)
+        if HRLib.callbacksPromises[name] and (HRLib.callbacksPromises[name] --[[@as promise]]).state ~= 3 then
+            Citizen.Await(HRLib.callbacksPromises[name])
+        end
+
         HRLib.callbacksPromises[name] = promise.new()
 
         TriggerServerEvent(('__%s:SendCallback'):format(resName), name, ...)
