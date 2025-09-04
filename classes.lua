@@ -186,5 +186,5 @@
 ---@field driftTyres boolean?
 
 ---@class HRLibHookableFunction
----@field __call fun(self: HRLibHookableFunction, ...: any) the function that returns to trigger the set function in the metatable (don't need to call this as a method, just: `(returned value)(...)`)
+---@field __call fun(self: HRLibHookableFunction, ...: any): any the function that returns to trigger the set function in the metatable (don't need to call this as a method, just: `(returned value)(...)`)
 ---@field set fun(self: HRLibHookableFunction, isJustAddition: boolean?, fn: function) the method to call when you want to replace the whole function or just add addition to it
