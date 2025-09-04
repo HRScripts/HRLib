@@ -28,6 +28,7 @@ return {
     'vehProps',
     'setDefaultPedVariation',
     'getServerInfo',
-    'time'
-
+    'time',
+    'hookableFunction',
+    'isFunction'
 }
