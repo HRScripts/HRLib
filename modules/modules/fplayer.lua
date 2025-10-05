@@ -1,34 +1,28 @@
 local isServer <const> = IsDuplicityVersion()
-local fplayer <const> = setmetatable({
-    id = nil
-}, {
-    __index = function(self, key)
-        if not self.id then
-            return 'FPlayer Id\'s not set'
-        else
-            return rawget(self, key)
-        end
-    end
-})
-
----@param id integer
-function fplayer:newObject(id)
-    if not HRLib.DoesIdExist(tonumber(id)) then return end
-
-    local newObject <const> = HRLib.table.deepclone(fplayer)
-    newObject.id = id
-
-    return newObject
-end
-
----@param coords vector3
-function fplayer:Teleport(coords)
-    if type(coords) ~= 'vector3' then return end
-
-    SetEntityCoordsNoOffset(GetPlayerPed(isServer and self.id or GetPlayerFromServerId(self.id)), coords) ---@diagnostic disable-line: missing-parameter, param-type-mismatch
-end
-
 if isServer then
+    local fplayer <const> = setmetatable({
+        id = nil
+    }, {
+        __index = function(self, key)
+            if not self.id then
+                return 'FPlayer Id\'s not set'
+            else
+                return rawget(self, key)
+            end
+        end
+    })
+
+    ---@param id integer
+    function fplayer:newObject(id)
+        if not HRLib.DoesIdExist(tonumber(id)) then return end
+
+        local newObject <const> = HRLib.table.deepclone(fplayer)
+        newObject.id = id
+
+        return newObject
+    end
+
+    ---Function to spawn a vehicle on the coords of the current player
     ---@param vehModel string|integer vehicle model
     ---@param spawnPlayerInside boolean? spawn ped inside the vehicle
     ---@param saveVehicle boolean? save the old vehicle
@@ -52,6 +46,7 @@ if isServer then
         return veh
     end
 
+    ---Function to notify the current player
     ---@param description string content of the notice
     ---@param type 'success'|'error'|'info'|'warning' notification type
     ---@param duration number? notification duration in msec, default is 2500
@@ -61,6 +56,7 @@ if isServer then
         HRLib.Notify(self.id, description, type, duration, pos, sound)
     end
 
+    ---Function to execute a client event for the current player
     ---@param eventName any the event name
     ---@param ... any the event parameters
     function fplayer:FocusedEvent(eventName, ...)
@@ -69,6 +65,19 @@ if isServer then
         TriggerClientEvent(eventName, self.id, ...)
     end
 
+    ---Function to set current player's coords
+    ---@param coords vector3|vector4
+    function fplayer:SetCoords(coords)
+        if type(coords) == 'vector3' then
+            SetEntityCoordsNoOffset(GetPlayerPed(self.id), coords) ---@diagnostic disable-line: missing-parameter, param-type-mismatch
+        elseif type(coords) == 'vector4' then
+            local playerPed <const> = GetPlayerPed(self.id)
+            SetEntityCoordsNoOffset(playerPed, HRLib.ToVector3(coords)) ---@diagnostic disable-line: missing-parameter, param-type-mismatch
+            SetEntityHeading(playerPed, coords[4])
+        end
+    end
+
+    ---Function to get an array of FPlayer for all players
     ---@return HRLibServerFPlayer[]?
     HRLib.AllFPlayers = function()
         local allFPlayers <const> = {}
@@ -89,59 +98,66 @@ if isServer then
             return fplayer:newObject(playerId)
         end
     end
+
+    ---@param health number? value of the player health
+    function fplayer:SetHealth(health)
+        local ped <const> = GetPlayerPed(isServer and self.id or GetPlayerFromServerId(self.id))
+        SetEntityHealth(ped, type(health) == 'number' and health or GetEntityMaxHealth(ped))
+    end
+
+    ---@param toggle boolean? toggle player invincible
+    function fplayer:SetInvincibility(toggle)
+        SetPlayerInvincible(isServer and self.id or GetPlayerFromServerId(self.id), toggle or false)
+    end
 else
-    ---@param vehModel string|integer vehicle spawn code or model hash
-    ---@param spawnPlayerInside boolean?
-    ---@param saveVehicle boolean?
+    HRLib.FPlayer = {}
+
+    ---Function to spawn a vehicle on the coords of the current player, containing a few options
+    ---@param model string|integer
+    ---@param spawnPlayerInside boolean
+    ---@param saveVehicle boolean Save the old vehicle if 
     ---@return integer? vehicle
-    function fplayer:SpawnVehicle(vehModel, spawnPlayerInside, saveVehicle)
-        local model <const>, ped <const> = joaat(vehModel), GetPlayerPed(GetPlayerFromServerId(self.id))
+    HRLib.FPlayer.SpawnVehicle = function(model, spawnPlayerInside, saveVehicle)
+        model = type(model) == 'string' and joaat(model) or type(model) == 'number' and model or -1
 
-        HRLib.RequestModel(model)
+        if IsModelValid(model) and IsModelAVehicle(model) then
+            local ped <const> = PlayerPedId()
 
-        if not saveVehicle then
-            local oldVeh <const> = GetVehiclePedIsIn(ped, false)
-            if oldVeh then
-                DeleteEntity(oldVeh)
+            if not saveVehicle then
+                local oldVeh <const> = GetVehiclePedIsIn(ped, false)
+                if oldVeh then
+                    DeleteEntity(oldVeh)
+                end
             end
+
+            HRLib.RequestModel(model)
+
+            local veh <const> = CreateVehicle(type(model) == 'string' and joaat(model) or model, GetEntityCoords(ped), GetEntityHeading(ped), true, false) ---@diagnostic disable-line: missing-parameter, param-type-mismatch
+
+            if spawnPlayerInside then
+                SetPedIntoVehicle(ped, veh, -1)
+            end
+
+            return veh
         end
+    end
 
-        local veh <const> = CreateVehicle(model, GetEntityCoords(ped), GetEntityHeading(ped), true, false) ---@diagnostic disable-line: missing-parameter, param-type-mismatch
-        SetModelAsNoLongerNeeded(model)
-
-        if spawnPlayerInside then
-            SetPedIntoVehicle(ped, veh, -1)
+    ---Function to set current player's coords
+    ---@param coords vector3|vector4
+    HRLib.FPlayer.SetCoords = function(coords)
+        local playerPed <const> = PlayerPedId()
+        if type(coords) == 'vector3' then
+            SetEntityCoordsNoOffset(playerPed, coords) ---@diagnostic disable-line: missing-parameter, param-type-mismatch
+        elseif type(coords) == 'vector4' then
+            SetEntityCoordsNoOffset(playerPed, HRLib.ToVector3(coords)) ---@diagnostic disable-line: missing-parameter, param-type-mismatch
+            SetEntityHeading(playerPed, coords[4])
         end
-
-        return veh
     end
 
-    ---Freeze the current player
-    ---@param toggle boolean? toggle the ped status
-    function fplayer:Freeze(toggle)
-        local ped <const> = GetPlayerPed(GetPlayerFromServerId(self.id))
-        toggle = toggle or false
-
-        FreezeEntityPosition(ped, toggle)
-        SetEntityCollision(ped, not toggle, false)
-        SetEntityCanBeDamaged(ped, not toggle)
-        SetPlayerControl(GetPlayerFromServerId(self.id), not toggle) ---@diagnostic disable-line: missing-parameter
+    ---Function to set current player's health
+    ---@param health number?
+    HRLib.FPlayer.SetHealth = function(health)
+        local ped <const> = PlayerPedId()
+        SetEntityHealth(ped, type(health) == 'number' and health or GetEntityMaxHealth(ped))
     end
-
-    ---Function to get FPlayer's list of methods
-    ---@return HRLibClientFPlayer?
-    HRLib.GetFPlayer = function()
-        return fplayer:newObject(GetPlayerServerId(PlayerId()))
-    end
-end
-
----@param health number? value of the player health
-function fplayer:SetHealth(health)
-    local ped <const> = GetPlayerPed(isServer and self.id or GetPlayerFromServerId(self.id))
-    SetEntityHealth(ped, type(health) == 'number' and health or GetEntityMaxHealth(ped))
-end
-
----@param toggle boolean? toggle player invincible
-function fplayer:SetInvincibility(toggle)
-    SetPlayerInvincible(isServer and self.id or GetPlayerFromServerId(self.id), toggle or false)
 end
