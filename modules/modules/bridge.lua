@@ -20,6 +20,7 @@ if not framework then
 end
 
 HRLib.bridge = {}
+HRLib.bridge.inv = {}
 HRLib.bridge.framework = framework
 HRLib.bridge.type = esxStatus == 'started' and 'esx' or qbStatus == 'started' and 'qb'
 
@@ -171,11 +172,28 @@ else
         end)
     end
 
-    HRLib.bridge.isPlayerLoaded = function()
+    HRLib.bridge.playerLoaded = function()
         return HRLib.bridge.type == 'esx' and HRLib.bridge.framework.IsPlayerLoaded() or LocalPlayer.state.isLoggedIn
     end
 
-    if HRLib.bridge.isPlayerLoaded() then
+    if HRLib.bridge.playerLoaded() then
         HRLib.bridge.isPlayerSpawned = true
     end
+end
+
+local inventory <const> = GetResourceState('ox_inventory') == 'started' and 'ox' or GetResourceState('qb-inventory') == 'started' and 'qb'
+if inventory then
+    local invFns = inventory == 'ox' and exports.ox_inventory or exports['qb-inventory']
+
+    ---@param playerId integer
+    ---@param itemName string
+    ---@param count integer
+    ---@return boolean success
+    HRLib.bridge.inv.addItem = function(playerId, itemName, count)
+        return select(1, invFns:AddItem(playerId, itemName, count))
+    end
+
+    HRLib.bridge.inv.type = inventory
+else
+    HRLib.bridge.inv = nil
 end
