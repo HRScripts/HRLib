@@ -236,7 +236,7 @@ else
     end
 end
 
----@param includeStoppedResources boolean? default value is for not including the stopped resources
+---@param includeStoppedResources boolean? sets whether or not the search should skip the stopped resources or not (by default it doesn't include them)
 ---@return string[] resourcesList
 HRLib.GetAllResources = function(includeStoppedResources)
     local resourcesList <const> = {}
@@ -249,4 +249,21 @@ HRLib.GetAllResources = function(includeStoppedResources)
     end
 
     return resourcesList
+end
+
+---@param metadataKey string metadata key to compare the filter parameter with
+---@param filter any the value to compare when searching
+---@param includeStoppedResources boolean? sets whether or not the search should skip the stopped resources or not (by default it doesn't include them)
+---@return string[]|false resourcesList
+HRLib.GetAllResourcesFiltered = function(metadataKey, filter, includeStoppedResources)
+    local resourcesList <const> = {}
+
+    local resources <const> = HRLib.GetAllResources(includeStoppedResources)
+    for i=1, #resources do
+        if GetResourceMetadata(resources[i], metadataKey, -1) == filter then
+            resourcesList[#resourcesList+1] = resources[i]
+        end
+    end
+
+    return #resourcesList > 0 and resourcesList
 end
