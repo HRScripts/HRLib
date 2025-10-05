@@ -1,9 +1,10 @@
 local resName <const> = GetCurrentResourceName()
 if IsDuplicityVersion() then
+    ---Function to register a server side command with some additional parameters
     ---@param name string|string[] the name of the command
     ---@param accessFromConsole boolean allow access to the command from the console
     ---@param accessFromInGame boolean allow access to the command from the game
-    ---@param cb fun(args: string[]|{}, rawCommand: any, IPlayer: HRLibServerIPlayer|table, FPlayer: HRLibServerFPlayer) return values: args, rawCommand, IPlayer, FPlayer
+    ---@param cb fun(args: string[]|{}, rawCommand: any, IPlayer: HRLibServerIPlayer|table, FPlayer: HRLibServerFPlayer)
     ---@param suggestions { help: string?, restricted: boolean?, args: { name: string, help: string }[]? }?
     HRLib.RegCommand = function(name, accessFromConsole, accessFromInGame, cb, suggestions)
         suggestions = type(suggestions) == 'table' and suggestions or {}
@@ -131,8 +132,9 @@ if IsDuplicityVersion() then
         end
     end)
 else
-    ---@param name string|string[] name of the command
-    ---@param cb fun(args: string[]|{}, rawCommand: any, IPlayer: HRLibClientIPlayer, FPlayer: HRLibClientFPlayer) function arguments: args, rawCommand, IPlayer
+    ---Function to register a client side command with some additional options
+    ---@param name string|string[]
+    ---@param cb fun(args: string[]|{}, rawCommand: any)
     ---@param suggestions { help: string?, args: { name: string, help: string }[]? }?
     HRLib.RegCommand = function(name, cb, suggestions)
         suggestions = type(suggestions) == 'table' and suggestions or {}
@@ -150,12 +152,7 @@ else
         TriggerEvent('chat:addSuggestion', ('/%s'):format(name), suggestions.help or '', (type(suggestions.args) == 'table' and table.type(suggestions.args) == 'array') and suggestions.args or {})
 
         local callback = function(_, args, rawCommand)
-            cb(
-                args,
-                rawCommand,
-                HRLib.GetIPlayer(),
-                HRLib.GetFPlayer() --[[@as HRLibClientFPlayer]]
-            )
+            cb(args, rawCommand)
         end
 
         if type(name) == 'string' then
