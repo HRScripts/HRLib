@@ -88,61 +88,58 @@ if IsDuplicityVersion() then
         return #allIPlayers > 0 and allIPlayers or nil
     end
 else
-    ---@return HRLibClientIPlayer IPlayer
-    HRLib.GetIPlayer = function()
-        local playerId <const> = GetPlayerServerId(PlayerId())
-        local p <const> = GetPlayerFromServerId(playerId)
-        return setmetatable({
-            source = playerId, id = playerId, Id = playerId, ID = playerId, playerId = playerId, player = playerId, serverId = playerId, plId = playerId, serverPlId = playerId, sPlId = playerId,
-            state = LocalPlayer.state,
-            max = setmetatable({
-                stamina = GetPlayerMaxStamina(playerId),
-                armour = GetPlayerMaxArmour(playerId),
-                health = GetEntityMaxHealth(GetPlayerPed(p))
-            }, {
-                __index = function(self, k)
-                    if k == 'health' then
-                        return GetEntityMaxHealth(GetPlayerPed(p))
-                    end
-
-                    return rawget(self, k)
-                end
-            }),
-            name = GetPlayerName(GetPlayerFromServerId(playerId)),
-            entity = setmetatable({
-                archetypeName = GetEntityArchetypeName(p),
-                model = GetEntityModel(p),
-                mapdataOwner = { GetEntityMapdataOwner(p) },
-                populationType = GetEntityPopulationType(p),
-                type = GetEntityType(p)
-            }, {
-                __index = function(self, k)
-                    local modules <const> = HRLib.table.getKeys(self, true)
-                    if type(modules) == 'table' then
-                        for i=1, #modules do
-                            local curr <const> = modules[i]
-                            rawset(self, curr, curr == 'mapdataOwner' and { GetEntityMapdataOwner(GetPlayerPed(p)) } or (curr == 'archeTypeName' and GetEntityArchetypeName or curr == 'model' and GetEntityModel or curr == 'populationType' and GetEntityPopulationType or GetEntityType)(GetPlayerPed(p)))
-                        end
-                    end
-
-                    return rawget(self, k)
-                end
-            })
+    local playerId <const> = GetPlayerServerId(PlayerId())
+    local p <const> = GetPlayerFromServerId(playerId)
+    HRLib.IPlayer = setmetatable({
+        source = playerId, id = playerId, Id = playerId, ID = playerId, playerId = playerId, player = playerId, serverId = playerId, plId = playerId, serverPlId = playerId, sPlId = playerId,
+        state = LocalPlayer.state,
+        max = setmetatable({
+            stamina = GetPlayerMaxStamina(playerId),
+            armour = GetPlayerMaxArmour(playerId),
+            health = GetEntityMaxHealth(GetPlayerPed(p))
         }, {
             __index = function(self, k)
-                local ped <const> = GetPlayerPed(p)
-                if k == 'ped' then
-                    return ped
-                elseif k == 'coords' or k == 'coordinates' then
-                    return GetEntityCoords(ped)
-                elseif k == 'heading' then
-                    return GetEntityHeading(ped)
-                elseif k == 'health' then
-                    return GetEntityHealth(ped)
+                if k == 'health' then
+                    return GetEntityMaxHealth(GetPlayerPed(p))
+                end
+
+                return rawget(self, k)
+            end
+        }),
+        name = GetPlayerName(GetPlayerFromServerId(playerId)),
+        entity = setmetatable({
+            archetypeName = GetEntityArchetypeName(p),
+            model = GetEntityModel(p),
+            mapdataOwner = { GetEntityMapdataOwner(p) },
+            populationType = GetEntityPopulationType(p),
+            type = GetEntityType(p)
+        }, {
+            __index = function(self, k)
+                local modules <const> = HRLib.table.getKeys(self, true)
+                if type(modules) == 'table' then
+                    for i=1, #modules do
+                        local curr <const> = modules[i]
+                        rawset(self, curr, curr == 'mapdataOwner' and { GetEntityMapdataOwner(GetPlayerPed(p)) } or (curr == 'archeTypeName' and GetEntityArchetypeName or curr == 'model' and GetEntityModel or curr == 'populationType' and GetEntityPopulationType or GetEntityType)(GetPlayerPed(p)))
+                    end
                 end
 
                 return rawget(self, k)
             end
         })
-    end
+    }, {
+        __index = function(self, k)
+            local ped <const> = GetPlayerPed(p)
+            if k == 'ped' then
+                return ped
+            elseif k == 'coords' or k == 'coordinates' then
+                return GetEntityCoords(ped)
+            elseif k == 'heading' then
+                return GetEntityHeading(ped)
+            elseif k == 'health' then
+                return GetEntityHealth(ped)
+            end
+
+            return rawget(self, k)
+        end
+    }) --[[@as HRLibClientIPlayer]]
 end
