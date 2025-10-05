@@ -173,18 +173,18 @@ else
 
     RegisterNetEvent('HRLib:Notify', HRLib.Notify)
 
-    RegisterNUICallback('getConfig', function(_, cb)
+    RegisterNuiCallback('getConfig', function(_, cb)
         cb(HRLib.require('@HRLib/config.lua'))
     end)
 
-    RegisterNUICallback('getButtonsTranslation', function(data, cb)
+    RegisterNuiCallback('getButtonsTranslation', function(data, cb)
         cb({
             confirmLabel = data.type == 'alert' and config.alertDialogueTranslation.agreeButton or config.inputDialogueTranslation.confirmButton,
             cancelLabel = config[data.type == 'alert' and 'alertDialogueTranslation' or 'inputDialogueTranslation'].cancelButton
         })
     end)
 
-    RegisterNUICallback('closeDialogue', function(data)
+    RegisterNuiCallback('closeDialogue', function(data)
         SetNuiFocus(false, false)
 
         if data.dialogueType == 'alert' then
