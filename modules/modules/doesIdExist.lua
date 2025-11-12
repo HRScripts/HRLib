@@ -1,4 +1,4 @@
----@param playerId integer|string? player server Id
+---@param playerId integer|string|any? The only value types for playerIds allowed are string and integer but we put any in here so check for number or string are not necessary (diagnostical problem solving)
 ---@param onlyIdsOfJoinedPlayers boolean? default: false. Sets whether or not the check must be over the ids of the joined/spawned players in the game. Available in server side only
 ---@return boolean
 HRLib.DoesIdExist = function(playerId, onlyIdsOfJoinedPlayers)

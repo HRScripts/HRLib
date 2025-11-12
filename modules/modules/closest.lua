@@ -1,5 +1,5 @@
 if IsDuplicityVersion() then
-    ---The server side function to get the closest IPlayer according to coordinates
+    ---The server side function to get the closest IPlayer in specific area
     ---@param source integer|vector3|vector4 the source, coords or playerId
     ---@param distance number? Default value is 50
     ---@param returnClosePlayers boolean?
@@ -7,9 +7,9 @@ if IsDuplicityVersion() then
     HRLib.ClosestIPlayer = function(source, distance, returnClosePlayers)
         if type(source) ~= 'vector3' and type(source) ~= 'vector4' and (type(source) ~= 'number' or not HRLib.DoesIdExist(source)) then return end
 
-        source = type(source) == 'number' and GetEntityCoords(GetPlayerPed(source)) or HRLib.ToVector3(source --[[@as vector3|vector4]]) --[[@as vector3]]
+        source = HRLib.DoesIdExist(source) and GetEntityCoords(GetPlayerPed(source --[[@as integer]])) or source.xyz
 
-        local players = GetPlayers()
+        local players <const> = GetPlayers()
         if #players > 0 then
             local firstPlayerPed = GetPlayerPed(tonumber(players[1]) --[[@as integer]])
             local firstPlayerDistance = #(source - GetEntityCoords(firstPlayerPed))
