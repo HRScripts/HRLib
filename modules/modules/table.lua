@@ -4,36 +4,27 @@
 ---@param cb fun(i: integer, curr: any)? i: the current loop consecutive number; curr: the current loop value taken from the array via the loop's consecutive number
 HRLib.table.focusedArray = function(array, focus, cb)
     if (type(array) == 'table' and table.type(array) == 'array') and focus and type(focus) == 'table' and table.type(focus) == 'hash' then
-        local focusString
+        local focusInArray <const> = {}
 
         for k,v in pairs(focus) do
-            if type(focusString) == 'string' then
-                focusString = ('%s | %s = %s'):format(focusString, k, v)
-            else
-                focusString = ('%s = %s'):format(k, v)
-            end
+            focusInArray[#focusInArray+1] = {
+                key = k,
+                value = v
+            }
         end
 
-        local focusInArray <const> = HRLib.string.split(focusString, ' | ', nil, true) --[[@as string[] ]] or {}
         for i=1, #array do
             local curr <const> = array[i]
-            if #focusInArray > 1 then
+            if type(curr) == 'table' then
                 local falseValues = #focusInArray
+
                 for l=1, #focusInArray do
-                    local current <const> = HRLib.string.split(focusInArray[l], ' = ', nil, true) --[[@as string[] ]]
-                    if curr[current[1]] == current[2] then
+                    if curr[focusInArray[l].key] == focusInArray[l].value then
                         falseValues -= 1
                     end
                 end
 
                 if falseValues == 0 then
-                    if type(cb) == 'function' then
-                        cb(i, curr)
-                    end
-                end
-            else
-                local focusValue = HRLib.string.split(focusString, ' = ', nil, true) --[[@as string[] ]]
-                if tostring(curr[focusValue[1]]) == tostring(focusValue[2]) then
                     if type(cb) == 'function' then
                         cb(i, curr)
                     end
@@ -149,8 +140,8 @@ HRLib.table.find = function(tbl, value, returnIndex, isValueKey, returnUnderInde
     if #indexes > 0 then
         local returnTbl <const> = {
             true,
-            returnIndex and #indexes > 1 and indexes or #indexes == 1 and table.unpack(indexes),
-            returnUnderIndex and #underIndexes > 1 and indexes or table.unpack(underIndexes)
+            returnIndex and (#indexes > 1 and indexes or #indexes == 1 and table.unpack(indexes)) or nil,
+            returnUnderIndex and (#underIndexes > 1 and indexes or table.unpack(underIndexes)) or nil
         }
         return table.unpack(returnTbl) ---@diagnostic disable-line: return-type-mismatch, redundant-return-value
     end
