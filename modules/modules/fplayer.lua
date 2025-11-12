@@ -37,7 +37,8 @@ if isServer then
             end
         end
 
-        local veh <const> = CreateVehicle(type(vehModel) == 'string' and joaat(vehModel) or vehModel, GetEntityCoords(ped), GetEntityHeading(ped), true, false) ---@diagnostic disable-line: missing-parameter, param-type-mismatch
+        local pedCoords <const> = GetEntityCoords(ped)
+        local veh <const> = CreateVehicle(type(vehModel) == 'string' and joaat(vehModel) or vehModel, pedCoords.x, pedCoords.y, pedCoords.z, GetEntityHeading(ped), true, false)
 
         if spawnPlayerInside == true then
             SetPedIntoVehicle(ped, veh, -1)
@@ -68,12 +69,12 @@ if isServer then
     ---Function to set current player's coords
     ---@param coords vector3|vector4
     function fplayer:SetCoords(coords)
-        if type(coords) == 'vector3' then
-            SetEntityCoordsNoOffset(GetPlayerPed(self.id), coords) ---@diagnostic disable-line: missing-parameter, param-type-mismatch
-        elseif type(coords) == 'vector4' then
-            local playerPed <const> = GetPlayerPed(self.id)
-            SetEntityCoordsNoOffset(playerPed, HRLib.ToVector3(coords)) ---@diagnostic disable-line: missing-parameter, param-type-mismatch
-            SetEntityHeading(playerPed, coords[4])
+        local playerPed <const> = GetPlayerPed(self.id)
+
+        SetEntityCoordsNoOffset(playerPed, table.unpack(coords.xyz))
+
+        if type(coords) == 'vector4' then
+            SetEntityHeading(playerPed, coords.w)
         end
     end
 
@@ -132,7 +133,8 @@ else
 
             HRLib.RequestModel(model)
 
-            local veh <const> = CreateVehicle(type(model) == 'string' and joaat(model) or model, GetEntityCoords(ped), GetEntityHeading(ped), true, false) ---@diagnostic disable-line: missing-parameter, param-type-mismatch
+            local pedCoords <const> = GetEntityCoords(ped)
+            local veh <const> = CreateVehicle(type(model) == 'string' and joaat(model) or model, pedCoords.x, pedCoords.y, pedCoords.z, GetEntityHeading(ped), true, false)
 
             if spawnPlayerInside then
                 SetPedIntoVehicle(ped, veh, -1)
@@ -146,11 +148,11 @@ else
     ---@param coords vector3|vector4
     HRLib.FPlayer.SetCoords = function(coords)
         local playerPed <const> = PlayerPedId()
-        if type(coords) == 'vector3' then
-            SetEntityCoordsNoOffset(playerPed, coords) ---@diagnostic disable-line: missing-parameter, param-type-mismatch
-        elseif type(coords) == 'vector4' then
-            SetEntityCoordsNoOffset(playerPed, HRLib.ToVector3(coords)) ---@diagnostic disable-line: missing-parameter, param-type-mismatch
-            SetEntityHeading(playerPed, coords[4])
+
+        SetEntityCoordsNoOffset(playerPed, coords.x, coords.y, coords.z) ---@diagnostic disable-line: missing-parameter
+
+        if type(coords) == 'vector4' then
+            SetEntityHeading(playerPed, coords.w)
         end
     end
 
