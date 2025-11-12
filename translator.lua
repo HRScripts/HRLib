@@ -73,5 +73,22 @@ Translation = setmetatable({}, {
         end
 
         return self[k]
+    end,
+    __call = function(_, name)
+        if locales[language] then
+            if HRLib.string.find(name, '.') then
+                local path <const> = HRLib.string.split(name, '.', nil, true) --[[@as string[] ]]
+                local value = locales[language][path[1]]
+                for i=2, #path do
+                    value = value[path[i]]
+                end
+
+                return value
+            else
+                return locales[language][name]
+            end
+        else
+            warn('The currently chosen language is not set in the provided translations! Source: use of Translation call method.')
+        end
     end
 })
