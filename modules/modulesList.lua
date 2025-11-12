@@ -22,7 +22,6 @@ return {
     'regCommand',
     'spawnVehicle',
     'streaming',
-    'toVector',
     'trackingEntities',
     'values',
     'vehProps',
