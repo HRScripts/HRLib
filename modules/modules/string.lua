@@ -48,3 +48,17 @@ HRLib.string.gather = function(source, delimiter)
 
     return gatheredText
 end
+
+---Function to return boolean of if a match in the first string (parameter) with the byte(s) in the second string (parameter) was found
+---@param string string
+---@param query string
+---@return boolean
+HRLib.string.find = function(string, query)
+    for i=1, #string do
+        if i + #query - 1 <= #string and string:sub(i, i + #query - 1) == query then
+            return true
+        end
+    end
+
+    return false
+end
