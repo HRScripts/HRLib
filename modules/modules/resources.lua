@@ -1,43 +1,71 @@
 local isServer <const>, res <const> = IsDuplicityVersion(), GetCurrentResourceName()
 
----@param path string the file path (format: '@MyResource/server/server.lua')
----@return any? result
+---Function to require a file from the same or other resource
+---@param path string
+---@return any
 HRLib.require = function(path)
-    if type(path) ~= 'string' or not string.find(path, '@') or not string.find(path, '/') then return end
+    if type(path) == 'string' and #path > 0 then
+        local delimiter <const> = HRLib.string.find(path, '/') and '/' or (HRLib.string.find(path, '.') and '.')
+        local stringPath, resourceName = '', ''
 
-    local splittedPath <const> = HRLib.string.split(path, '/', 'string', true) --[[@as string[] ]]
-    local resourceName, filePath <const> = nil, path:sub(#splittedPath[1] + 2, #path)
+        do
+            local found <const> = HRLib.string.find(path, '@')
+            if found then
+                if not delimiter then return error(('Resource %s tried to require a file from another resource, providing an invalid path format'):format(res), 2) end
 
-    if splittedPath[1]:sub(1, 1) == '@' then
-        local name <const> = splittedPath[1]:sub(2, #splittedPath[1])
-        resourceName = GetResourceState(name) ~= 'missing' and name or false
+                local sepPath <const> = delimiter and HRLib.string.split(path, delimiter, nil, true) --[[@as string[] ]]
+                local newString = sepPath[2]
 
-        if not resourceName then
-            return error(('This resource (%s) does not exist! The path format is: \'@MyResource/example/example.lua\''):format(name), 2)
+                if sepPath[delimiter == '.' and 3 or 2] ~= 'lua' and sepPath[delimiter == '.' and 3 or 2] ~= 'json' then
+                    for i=3, (delimiter == '.' and (sepPath[#sepPath] == 'lua' or sepPath[#sepPath] == 'json')) and #sepPath - 1 or #sepPath do
+                        newString = ('%s/%s'):format(newString, sepPath[i])
+                    end
+                else
+                    newString = ('%s.%s'):format(sepPath[2], sepPath[3])
+                end
+
+                if delimiter == '.' and (newString == 'lua' or newString == 'json') then
+                    newString = ('%s.%s'):format(sepPath[1], sepPath[2])
+                elseif newString:sub(#newString - 3) ~= '.lua' and newString:sub(#newString - 4) ~= '.json' then
+                    newString = ('%s.%s'):format(newString, (sepPath[#sepPath] == 'lua' or sepPath[#sepPath] == 'json') and sepPath[#sepPath] or 'lua')
+                end
+
+                resourceName = sepPath[1]:sub(2)
+                stringPath = newString
+            else
+                if path:sub(#path - 3) ~= '.lua' and path:sub(#path - 4) ~= '.json' then
+                    stringPath = ('%s.lua'):format(path)
+                else
+                    stringPath = path
+                end
+
+                if delimiter and delimiter == '.' then
+                    local sepPath <const> = HRLib.string.split(stringPath, '.', 'string', true) --[[@as string]]
+                    local newString = ('%s'):format(sepPath[1])
+
+                    for i=2, #sepPath - 1 do
+                        newString('%s/%s'):format(newString, sepPath[i])
+                    end
+
+                    stringPath = ('%s.%s'):format(newString, sepPath[#sepPath])
+                end
+
+                resourceName = res
+            end
+        end
+
+        local file <const> = LoadResourceFile(resourceName, stringPath)
+        if file then
+            if stringPath:sub(#stringPath - 4) == '.json' then
+                return json.decode(file)
+            else
+                return load(file, ('@@%s/%s'):format(resourceName, stringPath))()
+            end
+        else
+            error(('Resource %s tried to require a file, providing invalid file path!'):format(res), 2)
         end
     else
-        return error('Invalid path format! The path format is: \'@MyResource/example/example.lua\'', 2)
-    end
-
-    local file <const> = LoadResourceFile(resourceName, filePath)
-
-    if not file then
-        return error(('The file %s does not exist in this resource (%s)!'):format(splittedPath[#splittedPath], resourceName), 2)
-    end
-
-    local fileFormat <const> = HRLib.string.split(filePath, '.', nil, true)[2]
-    if fileFormat == 'json' then
-        return json.decode(file)
-    elseif fileFormat == 'lua' then
-        local value <const>, err <const> = load(file, ('@%s'):format(path))
-
-        if not value or err then
-            return err
-        end
-
-        return value()
-    else
-        error(('The file format %s is not supported from HRLib.require function!'):format(fileFormat), 2)
+        error(('Resource %s tried to require a file, providing an invalid path'):format(res), 2)
     end
 end
 
