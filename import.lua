@@ -51,4 +51,33 @@ if IsDuplicityVersion() then
             end
         end
     end
+
+    ---Function to trigger a client registered net event
+    ---@param eventName string
+    ---@param playerId integer|integer[]|-1
+    ---@param ... any?
+    TriggerClientEvent = function(eventName, playerId, ...)
+        if #GetPlayers() > 0 then
+            local eventPayload <const> = msgpack.pack_args(...)
+            local length <const> = #eventPayload
+
+            if type(playerId) == 'table' and table.type(playerId) == 'array' then
+                for i=1, #playerId do
+                    if HRLib.DoesIdExist(playerId[i]) then
+                        TriggerClientEventInternal(eventName, playerId[i], eventPayload, length) ---@diagnostic disable-line: param-type-mismatch
+                    else
+                        local info <const> = debug.getinfo(3, 'Sl')
+                        warn(('^1%s:%s: Triggered client event, providing an invalid player id^3'):format(info.source:sub(2), info.currentline))
+                    end
+                end
+            elseif HRLib.DoesIdExist(playerId --[[@as integer]]) then
+                TriggerClientEventInternal(eventName, playerId, eventPayload, length) ---@diagnostic disable-line: param-type-mismatch
+            elseif playerId == -1 then
+                TriggerClientEventInternal(eventName, playerId, eventPayload, length) ---@diagnostic disable-line: param-type-mismatch
+            else
+                local info <const> = debug.getinfo(3, 'Sl')
+                warn(('^1%s:%s: Triggered client event, providing an invalid player id^3'):format(info.source:sub(2), info.currentline))
+            end
+        end
+    end
 end
