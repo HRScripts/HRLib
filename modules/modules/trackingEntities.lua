@@ -1,41 +1,41 @@
 local trackedEntities <const> = {}
 
-local deleteEntity = DeleteEntity
+if not IsDuplicityVersion() then
+    local deleteEntity = DeleteEntity
 
----Delete an entity from any entity types with given entityId
----@param entity integer
-DeleteEntity = function(entity)
-    if not DoesEntityExist(entity) then return end
+    ---Delete an entity from any entity types with given entityId
+    ---@param entity integer
+    DeleteEntity = function(entity)
+        if not DoesEntityExist(entity) then return end
 
-    local entityType = GetEntityType(entity)
-    entityType = entityType == 1 and 'ped' or entityType == 2 and 'vehicle' or entityType == 3 and 'object' ---@diagnostic disable-line: cast-local-type
+        local entityType = GetEntityType(entity)
+        entityType = entityType == 1 and 'ped' or entityType == 2 and 'vehicle' or entityType == 3 and 'object' ---@diagnostic disable-line: cast-local-type
 
-    if not HRLib.table.find(trackedEntities, { entity = entity }) then
-        TriggerEvent('HRLib:RemovedEntity', entityType, entity)
+        if not HRLib.table.find(trackedEntities, { entity = entity }) then
+            TriggerEvent('HRLib:RemovedEntity', entityType, entity)
+        end
+
+        deleteEntity(entity)
     end
 
-    deleteEntity(entity)
-end
+    ---Delete vehicle with given vehicleId
+    ---@param vehicle integer
+    DeleteVehicle = function(vehicle)
+        DeleteEntity(vehicle)
+    end
 
----Delete vehicle with given vehicleId
----@param vehicle integer
-DeleteVehicle = function(vehicle)
-    DeleteEntity(vehicle)
-end
+    ---Delete ped with given pedId
+    ---@param ped integer
+    DeletePed = function(ped)
+        DeleteEntity(ped)
+    end
 
----Delete ped with given pedId
----@param ped integer
-DeletePed = function(ped)
-    DeleteEntity(ped)
-end
+    ---Delete an object with given objectId
+    ---@param object integer
+    DeleteObject = function(object)
+        DeleteEntity(object)
+    end
 
----Delete an object with given objectId
----@param object integer
-DeleteObject = function(object)
-    DeleteEntity(object)
-end
-
-if not IsDuplicityVersion() then
     ---Function to track an entity's deletion with given entityId.\
     ---It is important to understand that a delay of 100ms may exist between the event execution and the entity's deletion (it's necessary for the optimization)
     ---@param entityId integer
@@ -147,6 +147,5 @@ if not IsDuplicityVersion() then
     end
 
     RegisterNetEvent('HRLib:TrackedEntityDeleted')
+    RegisterNetEvent('HRLib:RemovedEntity')
 end
-
-RegisterNetEvent('HRLib:RemovedEntity')
