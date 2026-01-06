@@ -4,7 +4,7 @@ local isHRLib <const>, isServer <const>, resName <const> = GetCurrentResourceNam
 
 ---@param name string the callback name
 ---@param isLocal boolean? Make the callback local for the current resource or global (doesn't work on HRLib export method)
----@param cb any the callback value
+---@param cb fun(...: any): any|fun(source: integer, ...: any): any|any the callback value
 HRLib.CreateCallback = function(name, isLocal, cb)
     if type(name) ~= 'string' or type(cb) == 'nil' then return end
 
