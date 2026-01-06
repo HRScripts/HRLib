@@ -71,82 +71,141 @@ HRLib.table.getHashLength = function(hash)
     return length
 end
 
----Finds if the given value is included in the table
----@param tbl any[]|table the array to search in
----@param value any|any[]|table the value or other array to match the main array with
----@param returnIndex boolean? default: false
----@param isValueKey boolean? it changes the function meaning at all with seeking key names match
----@param returnUnderIndex boolean?
----@return boolean isFound, integer|integer[]? index, string|string[]? underIndex
-HRLib.table.find = function(tbl, value, returnIndex, isValueKey, returnUnderIndex)
+--- ## Function to find different values in a table
+---
+--- * **Full Indexes are strings that point to the exact position of the found value in the given table. Use HRLib.table.convertFullIndex to use the value of a fullIndex**
+--- # HRLib Official Documentation
+---@param tbl table
+---@param value any|table<string|number, any> the value to seek for in the table
+---@param returnIndexes boolean? sets whether or not the indexes found should be returned
+---@param returnFullIndexes boolean? sets whether or not the full indexes should be returned
+---@param isValueAnActualTblValue boolean? if the given value is a table this sets whether or not the value should be again be treated as any other values types (without table type) or should be treated as a table with specific keys and values inside
+---@return boolean found, integer|string|table<integer, integer|string>? indexes, string|string[]? underIndexes
+HRLib.table.find = function(tbl, value, returnIndexes, returnFullIndexes, isValueAnActualTblValue)
+    if type(tbl) ~= 'table' or not value then return false end
+
     local indexes <const>, underIndexes <const> = {}, {}
 
-    if not isValueKey then
-        for k,tableV in pairs(tbl) do
-            if type(value) == 'table' then
-                if type(tableV) ~= 'table' then
-                    for valueK,v in pairs(value) do
-                        if valueK == k and tableV == v then
-                            indexes[#indexes+1] = k
-                        end
-                    end
-                else
-                    for valueK,v in pairs(value) do
-                        local found <const>, index <const> = HRLib.table.find(tableV, { [valueK] = v }, true)
-                        if found then
-                            indexes[#indexes+1] = k
-                            underIndexes[#underIndexes+1] = ('%s.%s'):format(k, index)
-                        end
-                    end
-                end
-            else
-                if type(tableV) ~= 'table' then
-                    if tableV == value then
+    if type(value) ~= 'table' or isValueAnActualTblValue then
+        for k,v in pairs(tbl) do
+            if v == value then
+                indexes[#indexes+1] = k
+                underIndexes[#underIndexes+1] = ('%s'):format(k)
+            elseif type(v) == 'table' then
+                for k2,v2 in pairs(v) do
+                    if v2 == value then
                         indexes[#indexes+1] = k
-                    end
-                else
-                    for _,v in pairs(tableV) do
-                        if v == value then
-                            indexes[#indexes+1] = k
-                        end
+                        underIndexes[#underIndexes+1] = ('%s.%s'):format(k, k2)
                     end
                 end
             end
         end
     else
-        for k,v in pairs(tbl) do
-            if k == value then
+        for k,v in pairs(value) do
+            if tbl[k] == v then
                 indexes[#indexes+1] = k
+                underIndexes[#underIndexes+1] = ('%s'):format(k)
             end
+        end
 
+        for k,v in pairs(tbl) do
             if type(v) == 'table' then
-                local valueCheck = function(self, subject)
-                    for vKey, vValue in pairs(subject) do
-                        if vKey == value then
-                            indexes[#indexes+1] = k
+                local found <const>, _ <const>, underIndexes2 <const> = HRLib.table.find(v, value, true, true)
+                if found then
+                    indexes[#indexes+1] = k
 
-                            return
-                        elseif vValue == 'table' then
-                            self(self, vValue)
+                    if type(underIndexes2) == 'table' then
+                        for i=1, #underIndexes2 do
+                            underIndexes[#underIndexes+1] = ('%s.%s'):format(k, underIndexes2[i])
                         end
+                    else
+                        underIndexes[#underIndexes+1] = ('%s.%s'):format(k, underIndexes2)
                     end
                 end
-
-                valueCheck(valueCheck, v)
             end
         end
     end
 
     if #indexes > 0 then
-        local returnTbl <const> = {
-            true,
-            returnIndex and (#indexes > 1 and indexes or #indexes == 1 and table.unpack(indexes)) or nil,
-            returnUnderIndex and (#underIndexes > 1 and indexes or table.unpack(underIndexes)) or nil
-        }
-        return table.unpack(returnTbl) ---@diagnostic disable-line: return-type-mismatch, redundant-return-value
+        if returnIndexes then
+            if returnFullIndexes then
+                return true, #indexes > 1 and indexes or indexes[1], #underIndexes > 1 and underIndexes or underIndexes[1]
+            else
+                return true, #indexes > 1 and indexes or indexes[1]
+            end
+        elseif returnFullIndexes then
+            return true, nil, #underIndexes > 1 and underIndexes or underIndexes[1]
+        else
+            return true
+        end
+    else
+        return false
+    end
+end
+
+---Function to access the addressed point in a table by full indexes (used in the HRLib.table.find function)
+--- # HRLib Official Documentation
+---@param tbl table the table with the value, the fullIndex points at
+---@param fullIndex string the fullIndex to use when returning the value from the given table
+---@return any
+HRLib.table.convertFullIndex = function(tbl, fullIndex)
+    if type(tbl) ~= 'table' or type(fullIndex) ~= 'string' then return end
+
+    if HRLib.string.find(fullIndex, '.') then
+        local splittedFullIndexes <const> = HRLib.string.split(fullIndex, '.', 'number', true) --[[@as table<integer, string|integer> ]]
+        local value = tbl[splittedFullIndexes[1]]
+
+        for i=2, #splittedFullIndexes do
+            value = value[splittedFullIndexes[i]]
+        end
+
+        return value
+    else
+        if tonumber(fullIndex) then
+            return tbl[tonumber(fullIndex)]
+        else
+            return tbl[fullIndex]
+        end
+    end
+end
+
+do
+    local changeValue = function(self, table, fullIndexes, actualPosition, numberPosition, value)
+        if #fullIndexes - numberPosition > 1 then
+            self(self, table, fullIndexes, actualPosition[fullIndexes[numberPosition+1]], numberPosition+1, value)
+        else
+            actualPosition[fullIndexes[#fullIndexes]] = value
+        end
     end
 
-    return false
+    ---Function that converts fullIndex when it's just a string and replaces it's representive value with `value` parameter in the following given table (`tbl`)
+    --- # HRLib Official Documentation
+    ---@param tbl table
+    ---@param fullIndex string
+    ---@param value any
+    ---@return boolean
+    HRLib.table.changeValueOfFullIndex = function(tbl, fullIndex, value)
+        if type(tbl) ~= 'table' or type(fullIndex) ~= 'string' then return false end
+
+        if HRLib.string.find(fullIndex, '.') then
+            local splittedIndexes <const> = HRLib.string.split(fullIndex, '.', 'number', true) --[[@as table<integer, string|integer> ]]
+            if #splittedIndexes > 2 then
+                changeValue(changeValue, tbl, splittedIndexes, tbl[splittedIndexes[1]], 1, value)
+            elseif #splittedIndexes == 2 then
+                tbl[splittedIndexes[1]][splittedIndexes[2]] = value
+            else
+                tbl[splittedIndexes[1]] = value
+            end
+
+            return true
+        elseif tbl[tonumber(fullIndex) or fullIndex] then
+            tbl[tonumber(fullIndex) or fullIndex] = value
+
+            return true
+        end
+
+        return false
+    end
 end
 
 ---@param tbl table
