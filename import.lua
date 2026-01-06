@@ -80,4 +80,33 @@ if IsDuplicityVersion() then
             end
         end
     end
+else
+    local permissionIndex <const> = math.random(1, 1000000000000)
+
+    SetNUIStatusDefaultMessage = setmetatable({
+        set = function(self, message)
+            if type(message) == 'table' and table.type(message) == 'hash' and HRLib.table.find(message, 'status') then
+                rawset(self, 'message', { permissionIndex = permissionIndex, message = message })
+            end
+        end
+    }, {
+        __newindex = function(self, key, value)
+            if type(value) == 'table' and value.permissionIndex == permissionIndex then
+                rawset(self, key, value.message)
+            end
+        end,
+    })
+
+    ---Function implemented by HRLib's import method that sets the nui focus in the client side to specific value and sends nui message (not required)\
+    ---@param status boolean the nui focus status
+    ---@param message table|'no'? if no even the default message won't be used
+    SetNUIStatus = function(status, message)
+        SetNuiFocus(status, status)
+
+        if message and type(message) == 'table' then
+            SendNUIMessage(message)
+        elseif SetNUIStatusDefaultMessage.message and message ~= 'no' then
+            SendNUIMessage(SetNUIStatusDefaultMessage.message)
+        end
+    end
 end
