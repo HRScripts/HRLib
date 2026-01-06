@@ -1,7 +1,7 @@
 local GetResourceState, serverSide <const> = GetResourceState, IsDuplicityVersion()
 local esxStatus, qbStatus = GetResourceState('es_extended'), GetResourceState('qb-core')
 
-if (esxStatus == 'missing' or esxStatus == 'stopped') and (qbStatus == 'missing' or qbStatus == 'stopped') then return end
+if esxStatus == 'missing' and qbStatus == 'missing' then return end
 
 if esxStatus == 'starting' or qbStatus == 'starting' or esxStatus == 'stopped' or qbStatus == 'stopped' then
     if esxStatus == 'stopped' or qbStatus == 'stopped' then StartResource(esxStatus == 'stopped' and 'es_extended' or 'qb-core') end
