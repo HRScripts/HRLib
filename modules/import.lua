@@ -29,17 +29,7 @@ HRLib = setmetatable({
 })
 
 if isServer then
-    HRLib.clientCallbacks = setmetatable({}, {
-        __newindex = function(self, k, v)
-            rawset(self, k, v)
-            TriggerEvent(('__%s:Receive_clibValues'):format(resName), 'ClientCallbacks', k, v)
-        end
-    })
+    HRLib.clientCallbacks = {}
 else
-    HRLib.serverCallbacks = setmetatable({}, {
-        __newindex = function(self, k, v)
-            rawset(self, k, v)
-            TriggerEvent(('__%s:Receive_clibValues'):format(resName), 'ServerCallbacks', k, v)
-        end
-    })
+    HRLib.serverCallbacks = {}
 end

@@ -1,4 +1,4 @@
----Function to return a metatable that allows when being modified, to change its __call function so it represents a hookable function
+---Function to return a metatable that allows to change its __call metamethod making it represent a hookable function
 ---@param initialFunction function?
 ---@return HRLibHookableFunction
 HRLib.HookableFunction = function(initialFunction)

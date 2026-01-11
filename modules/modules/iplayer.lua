@@ -2,12 +2,20 @@ if IsDuplicityVersion() then
     ---@diagnostic disable: param-type-mismatch
 
     local pli = GetPlayerIdentifierByType --[[@as fun(playerSrc: integer, identifierType: string): string]]
+    local entityFunctions <const> = {
+        isFreezed = IsEntityPositionFrozen,
+        model = GetEntityModel,
+        populationType = GetEntityPopulationType,
+        type = GetEntityType,
+        isVisible = IsEntityVisible,
+        netId = NetworkGetNetworkIdFromEntity,
+        networkId = NetworkGetNetworkIdFromEntity
+    }
 
     ---@param playerId integer An existing player server Id
     ---@return HRLibServerIPlayer? IPlayer
     HRLib.GetIPlayer = function(playerId)
         if HRLib.DoesIdExist(playerId) then
-            local p <const> = GetPlayerPed(playerId)
             return setmetatable({
                 source = playerId, id = playerId, Id = playerId, ID = playerId, playerId = playerId, player = playerId, serverId = playerId, plId = playerId, serverPlId = playerId, sPlId = playerId,
                 state = Player(playerId).state,
@@ -34,27 +42,13 @@ if IsDuplicityVersion() then
                     allString = ('%s\n%s\n%s\n%s'):format(GetPlayerToken(playerId, 0) or 'undefined', GetPlayerToken(playerId, 1) or 'undefined', GetPlayerToken(playerId, 2) or 'undefined', GetPlayerToken(playerId, 3) or 'undefined'),
                     num = GetNumPlayerTokens(playerId),
                 },
-                entity = setmetatable({
-                    isFreezed = IsEntityPositionFrozen(p),
-                    model = GetEntityModel(p),
-                    populationType = GetEntityPopulationType(p),
-                    type = GetEntityType(p),
-                    isVisible = IsEntityVisible(p),
-                    netId = NetworkGetNetworkIdFromEntity(p),
-                    networkId = NetworkGetNetworkIdFromEntity(p)
-                }, {
-                    __index = function(self, k)
-                        local modules <const> = HRLib.table.getKeys(self, true) --[[@as string[] ]]
-                        for i=1, #modules do
-                            local curr <const> = modules[i]
-                            rawset(self, curr, (curr == 'isFreezed' and IsEntityPositionFrozen or curr == 'model' and GetEntityModel or curr == 'populationType' and GetEntityPopulationType or curr == 'type' and GetEntityType or curr == 'isVisible' and IsEntityVisible or NetworkGetNetworkIdFromEntity)(GetPlayerPed(playerId)))
-                        end
-
-                        return rawget(self, k)
+                entity = setmetatable({}, {
+                    __index = function(_, k)
+                        return entityFunctions[k](GetPlayerPed(playerId))
                     end
                 })
             }, {
-                __index = function(self, k)
+                __index = function(_, k)
                     local ped <const> = GetPlayerPed(playerId)
                     if k == 'ping' then
                         return GetPlayerPing(ped)
@@ -69,8 +63,6 @@ if IsDuplicityVersion() then
                     elseif k == 'identifiersNum' then
                         return GetNumPlayerIdentifiers(playerId)
                     end
-
-                    return rawget(self, k)
                 end
             })
         end
@@ -88,46 +80,38 @@ if IsDuplicityVersion() then
         return #allIPlayers > 0 and allIPlayers or nil
     end
 else
+    local entityFunctions <const> = {
+        archetypeName = GetEntityArchetypeName,
+        model = GetEntityModel,
+        mapdataOwner = GetEntityMapdataOwner,
+        populationType = GetEntityPopulationType,
+        type = GetEntityType
+    }
+
     local playerId <const> = GetPlayerServerId(PlayerId())
     local p <const> = GetPlayerFromServerId(playerId)
     HRLib.IPlayer = setmetatable({
         source = playerId, id = playerId, Id = playerId, ID = playerId, playerId = playerId, player = playerId, serverId = playerId, plId = playerId, serverPlId = playerId, sPlId = playerId,
         state = LocalPlayer.state,
-        max = setmetatable({
-            stamina = GetPlayerMaxStamina(playerId),
-            armour = GetPlayerMaxArmour(playerId),
-            health = GetEntityMaxHealth(GetPlayerPed(p))
-        }, {
-            __index = function(self, k)
+        max = setmetatable({}, {
+            __index = function(_, k)
                 if k == 'health' then
                     return GetEntityMaxHealth(GetPlayerPed(p))
+                elseif k == 'stamina' then
+                    return GetPlayerMaxStamina(playerId)
+                elseif k == 'armour' then
+                    return GetPlayerMaxArmour(playerId)
                 end
-
-                return rawget(self, k)
             end
         }),
         name = GetPlayerName(GetPlayerFromServerId(playerId)),
-        entity = setmetatable({
-            archetypeName = GetEntityArchetypeName(p),
-            model = GetEntityModel(p),
-            mapdataOwner = { GetEntityMapdataOwner(p) },
-            populationType = GetEntityPopulationType(p),
-            type = GetEntityType(p)
-        }, {
-            __index = function(self, k)
-                local modules <const> = HRLib.table.getKeys(self, true)
-                if type(modules) == 'table' then
-                    for i=1, #modules do
-                        local curr <const> = modules[i]
-                        rawset(self, curr, curr == 'mapdataOwner' and { GetEntityMapdataOwner(GetPlayerPed(p)) } or (curr == 'archeTypeName' and GetEntityArchetypeName or curr == 'model' and GetEntityModel or curr == 'populationType' and GetEntityPopulationType or GetEntityType)(GetPlayerPed(p)))
-                    end
-                end
-
-                return rawget(self, k)
+        entity = setmetatable({}, {
+            __index = function(_, k)
+                return k ~= 'mapdataOwner' and entityFunctions[k](GetPlayerPed(p)) or { entityFunctions[k](GetPlayerPed(p)) }
             end
         })
     }, {
-        __index = function(self, k)
+        __index = function(_, k)
             local ped <const> = GetPlayerPed(p)
             if k == 'ped' then
                 return ped
@@ -138,8 +122,6 @@ else
             elseif k == 'health' then
                 return GetEntityHealth(ped)
             end
-
-            return rawget(self, k)
         end
     }) --[[@as HRLibClientIPlayer]]
 end

@@ -6,12 +6,8 @@ if type(locales) ~= 'table' or table.type(locales) ~= 'hash' then return end
 
 if type(language) ~= 'string' then
     Translation = setmetatable({}, {
-        __index = function(self, k)
-            if not rawget(self, k) then
-                self[k] = ('Language %s does not exist'):format(language)
-            end
-
-            return self[k]
+        __index = function()
+            return ('Language %s does not exist'):format(language)
         end
     })
 
@@ -45,34 +41,39 @@ end
 
 ::continue::
 
-Translation = setmetatable({}, {
-    __index = function(self, k)
-        if not rawget(self, k) then
-            local curr <const> = locales[language][k]
-            if type(curr) == 'table' then
-                self[k] = setmetatable({}, {
-                    __index = function(underself, key)
-                        if not rawget(underself, key) then
-                            if curr[key] then
-                                underself[key] = ('%s%s'):format(curr[key]:sub(1, 1):upper(), curr[key]:sub(2, #curr[key]))
-                            else
-                                error(('Translation %s called as Translation.%s.%s does not exist!'):format(key, k, key), 2)
-                            end
-                        end
+---@param self function
+---@param tbl table
+---@param cb fun(value: string): string
+local getIntoUnderTables = function(self, tbl, cb)
+    for k,v in pairs(tbl) do
+        if type(v) == 'string' then
+            tbl[k] = cb(v)
+        elseif type(v) == 'table' then
+            self(self, tbl, cb)
+        end
+    end
+end
 
-                        return underself[key]
-                    end
-                })
-            else
-                if curr then
-                    self[k] = ('%s%s'):format(curr:sub(1, 1):upper(), curr:sub(2, #curr))
-                else
-                    error(('Translation %s called as Translation.%s does not exist!'):format(k, k), 2)
+Translation = setmetatable({}, {
+    __newindex = function(self, k, v)
+        if type(v) == 'table' then
+            getIntoUnderTables(getIntoUnderTables, v, function(value)
+                return ('%s%s'):format(value:sub(1,1):upper(), value:sub(2, #value))
+            end)
+
+            setmetatable(v, {
+                __index = function(_, key)
+                    error(('Translation %s called as Translation.%s.%s does not exist!'):format(key, k, key), 2)
                 end
-            end
+            })
+        else
+            v = ('%s%s'):format(v:sub(1,1):upper(), v:sub(2, #v))
         end
 
-        return self[k]
+        rawset(self, k, v)
+    end,
+    __index = function(_, k)
+        error(('Translation %s called as Translation.%s does not exist!'):format(k, k), 2)
     end,
     __call = function(_, name)
         if locales[language] then

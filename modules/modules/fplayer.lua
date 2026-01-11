@@ -3,12 +3,16 @@ if isServer then
     local fplayer <const> = setmetatable({
         id = nil
     }, {
-        __index = function(self, key)
-            if not self.id then
-                return 'FPlayer Id\'s not set'
-            else
-                return rawget(self, key)
-            end
+        __newindex = function(self, k, v)
+            rawset(self, k, setmetatable({}, {
+                __call = function(underself, ...)
+                    if not self.id then
+                        return 'FPlayer\'s id value is not set'
+                    else
+                        return v(...)
+                    end
+                end
+            }))
         end
     })
 
