@@ -4,14 +4,26 @@ local esxStatus, qbStatus = GetResourceState('es_extended'), GetResourceState('q
 if esxStatus == 'missing' and qbStatus == 'missing' then return end
 
 if esxStatus == 'starting' or qbStatus == 'starting' or esxStatus == 'stopped' or qbStatus == 'stopped' then
-    if esxStatus == 'stopped' or qbStatus == 'stopped' then StartResource(esxStatus == 'stopped' and 'es_extended' or 'qb-core') end
+    if esxStatus == 'stopped' or qbStatus == 'stopped' then
+        Wait(2000)
 
-    while not esxStatus == 'started' or qbStatus == 'started' do
+        esxStatus, qbStatus = GetResourceState('es_extended'), GetResourceState('qb-core')
+
+        if esxStatus ~= 'started' and qbStatus ~= 'started' then
+            StartResource(esxStatus == 'stopped' and 'es_extended' or 'qb-core')
+        else
+            goto continue
+        end
+    end
+
+    while esxStatus ~= 'started' and qbStatus ~= 'started' do
         esxStatus, qbStatus = GetResourceState('es_extended'), GetResourceState('qb-core')
 
         Wait(100)
     end
 end
+
+::continue::
 
 local framework <const> = esxStatus == 'started' and exports.es_extended:getSharedObject() or qbStatus == 'started' and exports['qb-core']:GetCoreObject()
 
