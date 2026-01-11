@@ -16,7 +16,17 @@ end
 local framework <const> = esxStatus == 'started' and exports.es_extended:getSharedObject() or qbStatus == 'started' and exports['qb-core']:GetCoreObject()
 
 if not framework then
-    return error(GetCurrentResourceName() ~= 'HRLib' and 'No framework functions found!?' or ('No framework functions found!? Invoking resource: %s'):format(GetInvokingResource()))
+    HRLib.bridge = setmetatable({
+        framework = 'unknown_unusedBridge',
+        type = 'unknown_unusedBridge'
+    }, {
+        __index = function()
+            local invokingResource <const> = GetInvokingResource()
+            warn(('HRLib\'s bridge functions aren\'t available currently due to missing framework!%s%s'):format(invokingResource and ' Invoking resource: ', invokingResource or ''))
+        end
+    })
+
+    return warn(('^1%s^0'):format(('No framework functions found!?%s%s\nThe script will not provide its bridge functions until there\'s started core resource of the qb or esx legacy frameworks!'):format(GetInvokingResource() and ' Invoking resource: ', GetInvokingResource() or '')))
 end
 
 HRLib.bridge = {}
