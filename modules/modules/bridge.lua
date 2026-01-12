@@ -5,7 +5,7 @@ if esxStatus == 'missing' and qbStatus == 'missing' then return end
 
 if esxStatus == 'starting' or qbStatus == 'starting' or esxStatus == 'stopped' or qbStatus == 'stopped' then
     if esxStatus == 'stopped' or qbStatus == 'stopped' then
-        Wait(50)
+        Wait(100)
 
         esxStatus, qbStatus = GetResourceState('es_extended'), GetResourceState('qb-core')
 
