@@ -7,10 +7,8 @@ _ENV.HRLib = HRLib()
 local modules <const> = load(LoadResourceFile('HRLib', 'modules/modulesList.lua'), '@@HRLib/modules/modulesList.lua')()
 for i=1, #modules do
     if modules[i] ~= 'interface' then
-        CreateThread(function()
-            local path <const> = ('modules/modules/%s.lua'):format(modules[i])
-            load(LoadResourceFile('HRLib', path), ('@@HRLib/%s'):format(path))()
-        end)
+        local path <const> = ('modules/modules/%s.lua'):format(modules[i])
+        load(LoadResourceFile('HRLib', path), ('@@HRLib/%s'):format(path))()
     else
         local libFunctions <const> = exports.HRLib:getLibFunctions()
         local interfaceModules <const> = isServer and { 'Notify' } or { 'showTextUI', 'isTextUIOpen', 'hideTextUI', 'progressBar', 'createAlertDialogue', 'createInputDialogue', 'Notify' }
