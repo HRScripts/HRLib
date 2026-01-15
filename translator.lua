@@ -1,6 +1,19 @@
-local load = load
-local language = _VERSION == 'LuaGLM 5.4' and (Config or load(LoadResourceFile(GetCurrentResourceName(), 'config.lua') or 'return {}', ('@@%s/config.lua'):format(GetCurrentResourceName()))()?.language) or (Config or load(LoadResourceFile(GetCurrentResourceName(), 'config.lua') or 'return {}', ('@@%s/config.lua'):format(GetCurrentResourceName()))().language) --[[@as string]] ---@diagnostic disable-line: undefined-global
-local locales <const> = load(LoadResourceFile(GetCurrentResourceName(), 'translation.lua') or 'return nil', ('@@%s/translation.lua'):format(GetCurrentResourceName()))() or {} ---@diagnostic disable-line: undefined-global
+local load, currentResource <const> = load, GetCurrentResourceName()
+local language
+
+if Config then ---@diagnostic disable-line: undefined-global
+    language = Config.language ---@diagnostic disable-line: undefined-global
+else
+    local returnedConfig <const> = load(LoadResourceFile(currentResource, 'config.lua'), ('@@%s/config.lua'):format(currentResource))
+    if returnedConfig then
+        local config <const> = returnedConfig()
+        if type(config) == 'table' then
+            language = config.language
+        end
+    end
+end
+
+local locales <const> = load(LoadResourceFile(currentResource, 'translation.lua') or 'return nil', ('@@%s/translation.lua'):format(currentResource))() or {} ---@diagnostic disable-line: undefined-global
 
 if type(locales) ~= 'table' or table.type(locales) ~= 'hash' then return end
 
@@ -16,7 +29,7 @@ end
 
 if not locales[language] then
     local oldLanguage <const> = language
-    local warnMessage <const> = ('The language %s does not exist in resource %s! The current language translation is %s'):format(oldLanguage, GetCurrentResourceName(), '%s')
+    local warnMessage <const> = ('The language %s does not exist in resource %s! The current language translation is %s'):format(oldLanguage, currentResource, '%s')
 
     if locales['en'] then
         language = 'en'
@@ -41,39 +54,63 @@ end
 
 ::continue::
 
----@param self function
+local languageTranslations <const> = locales[language]
+
+---@param self fun(self: function, tbl: table, initialKey: string): table
 ---@param tbl table
----@param cb fun(value: string): string
-local getIntoUnderTables = function(self, tbl, cb)
-    for k,v in pairs(tbl) do
-        if type(v) == 'string' then
-            tbl[k] = cb(v)
-        elseif type(v) == 'table' then
-            self(self, tbl, cb)
+---@param initialKey string
+---@return table
+local setUnderTablesMetatables = function(self, tbl, initialKey)
+    local tblCopy <const> = HRLib.table.deepclone(tbl, true)
+
+    for k,v in pairs(tblCopy) do
+        if type(v) == 'table' then
+            tblCopy[k] = self(self, v, ('%s.%s'):format(initialKey, k))
+        elseif type(v) == 'string' then
+            tblCopy[k] = #v > 1 and ('%s%s'):format(v:sub(1,1):upper(), v:sub(2, #v)) or v:upper()
         end
     end
+
+    return setmetatable({}, {
+        __index = function(actualSelf, k)
+            if tblCopy[k] then
+                rawset(actualSelf, k, tblCopy[k])
+
+                return tblCopy[k]
+            else
+                error(('Translation %s called as Translation.%s.%s does not exist!'):format(k, initialKey, k), 2)
+            end
+        end
+    })
 end
 
 Translation = setmetatable({}, {
     __newindex = function(self, k, v)
         if type(v) == 'table' then
-            getIntoUnderTables(getIntoUnderTables, v, function(value)
-                return ('%s%s'):format(value:sub(1,1):upper(), value:sub(2, #value))
-            end)
-
-            setmetatable(v, {
-                __index = function(_, key)
-                    error(('Translation %s called as Translation.%s.%s does not exist!'):format(key, k, key), 2)
-                end
-            })
+            rawset(self, k, setUnderTablesMetatables(setUnderTablesMetatables, v, k))
         else
-            v = ('%s%s'):format(v:sub(1,1):upper(), v:sub(2, #v))
+            rawset(self, k, #v > 1 and ('%s%s'):format(v:sub(1,1):upper(), v:sub(2, #v)) or v:upper())
         end
-
-        rawset(self, k, v)
     end,
-    __index = function(_, k)
-        error(('Translation %s called as Translation.%s does not exist!'):format(k, k), 2)
+    __index = function(self, k)
+        local curr <const> = languageTranslations[k]
+        if curr then
+            if type(curr) == 'table' then
+                local value <const> = setUnderTablesMetatables(setUnderTablesMetatables, curr, k)
+
+                rawset(self, k, value)
+
+                return value
+            elseif type(curr) == 'string' then
+                local translation <const> = #curr > 1 and ('%s%s'):format(curr:sub(1,1):upper(), curr:sub(2, #curr)) or curr:upper()
+
+                rawset(self, k, translation)
+
+                return translation
+            end
+        else
+            error(('Translation %s called as Translation.%s does not exist!'):format(k, k), 2)
+        end
     end,
     __call = function(_, name)
         if locales[language] then
