@@ -1,4 +1,4 @@
-CreateThread(function() -- Adding the code in a thread so the awaits for existing framework core script starting are not interrupting with the starting of HRLib
+Citizen.CreateThreadNow(function() -- Adding the code in a thread so the awaits for existing framework core script starting are not interrupting with the starting of HRLib
     local GetResourceState, serverSide <const> = GetResourceState, IsDuplicityVersion()
     local esxStatus, qbStatus = GetResourceState('es_extended'), GetResourceState('qb-core')
 
