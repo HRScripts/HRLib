@@ -44,7 +44,9 @@ Citizen.CreateThreadNow(function() -- Adding the code in a thread so the awaits 
 
     HRLib.bridge = {}
     HRLib.bridge.inv = {}
+    ---@type table
     HRLib.bridge.framework = framework
+    ---@type 'esx'|'qb'|false
     HRLib.bridge.type = esxStatus == 'started' and 'esx' or qbStatus == 'started' and 'qb'
 
     if serverSide then

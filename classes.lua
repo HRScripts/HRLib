@@ -184,6 +184,7 @@
 ---@field tyres table<number|string,1|2>?
 ---@field bulletProofTyres boolean?
 ---@field driftTyres boolean?
+---@field modHydrolic integer?
 
 ---@class HRLibHookableFunction
 ---@field __call fun(self: HRLibHookableFunction, ...: any): any the function that returns to trigger the set function in the metatable (don't need to call this as a method, just: `(returned value)(...)`)

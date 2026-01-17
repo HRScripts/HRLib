@@ -32,7 +32,7 @@ if IsDuplicityVersion() then
             HRLib.registeredCmds[name] = {accessFromConsole = accessFromConsole, accessFromInGame = accessFromInGame, cb = cb, suggestions = suggestions}
 
             if type(suggestions) == 'table' and table.type(suggestions) ~= 'empty' then
-                if not suggestions.isRestricted then
+                if not suggestions.restricted then
                     TriggerClientEvent('chat:addSuggestion', -1, '/'..name, suggestions.help or '', (type(suggestions.args) == 'table' and table.type(suggestions.args) == 'array') and suggestions.args or {})
                 else
                     local players <const> = GetPlayers()
