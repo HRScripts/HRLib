@@ -4,7 +4,7 @@ local language
 if Config then ---@diagnostic disable-line: undefined-global
     language = Config.language ---@diagnostic disable-line: undefined-global
 else
-    local returnedConfig <const> = load(LoadResourceFile(currentResource, 'config.lua'), ('@@%s/config.lua'):format(currentResource))
+    local returnedConfig <const> = load(LoadResourceFile(currentResource, 'config.lua') or 'nil', ('@@%s/config.lua'):format(currentResource))
     if returnedConfig then
         local config <const> = returnedConfig()
         if type(config) == 'table' then
