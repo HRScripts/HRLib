@@ -47,8 +47,7 @@ if IsDuplicityVersion() then
             local regCmdFn = function(source, args, rawCommand)
                 if accessFromConsole and not accessFromInGame then
                     if source ~= 0 then
-                        HRLib.Notify(source, 'You cannot use this command from the game!', 'error', 2500)
-                        return
+                        return HRLib.Notify(source, 'You cannot use this command from the game!', 'error', 2500)
                     end
 
                     local IPlayer <const>, FPlayer <const> = {
@@ -74,16 +73,15 @@ if IsDuplicityVersion() then
                     cb(args, rawCommand, IPlayer, FPlayer)
                 elseif not accessFromConsole and accessFromInGame then
                     if source == 0 then
-                        print('^1! ERROR ! You cannot use this command from the console!^0')
-                        return
+                        return print('^1! ERROR ! You cannot use this command from the console!^0')
                     end
 
                     cb(args, rawCommand, HRLib.GetIPlayer(source) --[[@as HRLibServerIPlayer]], HRLib.GetFPlayer(source) --[[@as HRLibServerFPlayer]])
                 elseif accessFromConsole and accessFromInGame then
-                    local IPlayer <const>, FPlayer <const> = HRLib.GetIPlayer(source) or {
+                    local IPlayer <const>, FPlayer <const> = source ~= 0 and HRLib.GetIPlayer(source) or {
                         id = source, playerId = source, source = source, Id = source, serverId = source,
                         name = 'TxAdmin Console'
-                    }, HRLib.GetFPlayer(source) or {}
+                    }, source ~= 0 and HRLib.GetFPlayer(source) or {}
 
                     if table.type(FPlayer) == 'empty' then
                         function FPlayer:Notify(text, type)
@@ -105,6 +103,7 @@ if IsDuplicityVersion() then
                     cb(args, rawCommand, IPlayer, FPlayer)
                 end
             end
+
             local isRestricted <const> = type(suggestions.restricted) == 'boolean' and suggestions.restricted or false
             if type(name) == 'string' and name ~= '' then
                 RegisterCommand(name, regCmdFn, isRestricted)
