@@ -1,20 +1,6 @@
 local isServer <const> = IsDuplicityVersion()
 if isServer then
-    local fplayer <const> = setmetatable({
-        id = nil
-    }, {
-        __newindex = function(self, k, v)
-            rawset(self, k, setmetatable({}, {
-                __call = function(underself, ...)
-                    if not self.id then
-                        return 'FPlayer\'s id value is not set'
-                    else
-                        return v(...)
-                    end
-                end
-            }))
-        end
-    })
+    local fplayer <const> = {}
 
     ---@param id integer
     function fplayer:newObject(id)
@@ -22,6 +8,24 @@ if isServer then
 
         local newObject <const> = HRLib.table.deepclone(fplayer)
         newObject.id = id
+
+        setmetatable(newObject, {
+            __newindex = function(newObjectSelf, k, v)
+                if k ~= 'newObject' and k ~= 'id' then
+                    rawset(newObjectSelf, k, setmetatable({}, {
+                        __call = function(_, ...)
+                            if not newObjectSelf.id then
+                                return 'FPlayer\'s id value is not set'
+                            else
+                                return v(...)
+                            end
+                        end
+                    }))
+                else
+                    rawset(newObjectSelf, k, v)
+                end
+            end
+        })
 
         return newObject
     end
@@ -82,6 +86,17 @@ if isServer then
         end
     end
 
+    ---@param health number? value of the player health
+    function fplayer:SetHealth(health)
+        local ped <const> = GetPlayerPed(isServer and self.id or GetPlayerFromServerId(self.id))
+        SetEntityHealth(ped, type(health) == 'number' and health or GetEntityMaxHealth(ped))
+    end
+
+    ---@param toggle boolean? toggle player invincible
+    function fplayer:SetInvincibility(toggle)
+        SetPlayerInvincible(isServer and self.id or GetPlayerFromServerId(self.id), toggle or false)
+    end
+
     ---Function to get an array of FPlayer for all players
     ---@return HRLibServerFPlayer[]?
     HRLib.AllFPlayers = function()
@@ -102,17 +117,6 @@ if isServer then
         if playerId and HRLib.DoesIdExist(playerId) then
             return fplayer:newObject(playerId)
         end
-    end
-
-    ---@param health number? value of the player health
-    function fplayer:SetHealth(health)
-        local ped <const> = GetPlayerPed(isServer and self.id or GetPlayerFromServerId(self.id))
-        SetEntityHealth(ped, type(health) == 'number' and health or GetEntityMaxHealth(ped))
-    end
-
-    ---@param toggle boolean? toggle player invincible
-    function fplayer:SetInvincibility(toggle)
-        SetPlayerInvincible(isServer and self.id or GetPlayerFromServerId(self.id), toggle or false)
     end
 else
     HRLib.FPlayer = {}
