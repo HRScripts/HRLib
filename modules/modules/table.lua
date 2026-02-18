@@ -284,8 +284,8 @@ HRLib.table.compare = function(tbl1, tbl2, noKeyCompare)
 end
 
 ---Returns all keys of the given table
----@param tbl table
----@param isArray boolean? default is false
+---@param tbl table the table to get the keys of
+---@param isArray boolean? sets whether or not the returned value must be as an array or many values. Default is false
 ---@return ...|string[]?
 HRLib.table.getKeys = function(tbl, isArray)
     if type(tbl) ~= 'table' or table.type(tbl) == 'empty' then return end
