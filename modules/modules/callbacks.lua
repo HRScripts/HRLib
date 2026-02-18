@@ -1,3 +1,5 @@
+TriggerSide = nil
+
 local isHRLib <const>, isServer <const>, resName <const> = GetCurrentResourceName() == 'HRLib', IsDuplicityVersion(), GetCurrentResourceName()
 
 -- Functions
@@ -31,7 +33,7 @@ if isServer then
 
                 HRLib.callbacksPromises[name] = promise.new()
 
-                TriggerEvent('__HRLib:TransferCallback', resName, 'client', name)
+                TriggerEvent('__HRLib:TransferCallback', resName, 'server', name)
                 Citizen.Await(HRLib.callbacksPromises[name])
 
                 callback = HRLib.callbacks[name]
@@ -43,7 +45,13 @@ if isServer then
         end
 
         if type(callback) == 'function' or (type(callback) == 'table' and callback['__cfx_functionReference']) then
-            return callback(source, ...)
+            TriggerSide = 'current'
+
+            local result <const> = { callback(source, ...) }
+
+            TriggerSide = nil
+
+            return table.unpack(result) ---@diagnostic disable-line: redundant-return-value
         else
             return callback
         end
@@ -105,7 +113,13 @@ else
         end
 
         if type(callback) == 'function' or (type(callback) == 'table' and callback['__cfx_functionReference']) then
-            return callback(...)
+            TriggerSide = 'current'
+
+            local result <const> = { callback(...) }
+
+            TriggerSide = nil
+
+            return table.unpack(result) ---@diagnostic disable-line: redundant-return-value
         else
             return callback
         end
@@ -160,7 +174,9 @@ if isServer then
         local callback <const> = HRLib.callbacks[name]
 
         if callback ~= nil then
+            TriggerSide = 'client'
             params = (type(callback) == 'function' or (type(callback) == 'table' and callback['__cfx_functionReference'])) and { false, name, { callback(source, ...) } } or { false, name, { callback } }
+            TriggerSide = nil
         else
             params = { true, name, nil }
         end
@@ -173,7 +189,9 @@ else
         local callback <const> = HRLib.callbacks[name]
 
         if callback ~= nil then
+            TriggerSide = 'server'
             params = (type(callback) == 'function' or (type(callback) == 'table' and callback['__cfx_functionReference'])) and { false, name, { callback(...) } } or { false, name, { callback } }
+            TriggerSide = nil
         else
             params = { true, name, nil }
         end
