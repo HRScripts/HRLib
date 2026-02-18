@@ -197,12 +197,45 @@ Citizen.CreateThreadNow(function() -- Adding the code in a thread so the awaits 
             end)
         end
 
+        local functions <const> = setmetatable({}, {
+            __call = function(self)
+                for i=1, #self do
+                    Citizen.CreateThreadNow(function()
+                        local success, error = pcall(rawget(self, i))
+                        if not success then
+                            print(('^1Resource %s added an error causing function to the player spawn functions!'):format(GetInvokingResource() or GetCurrentResourceName()))
+                            print(('^1Error: %s'):format(error))
+                        end
+                    end)
+                end
+            end
+        })
+
+        ---When a function in this function's first parameter is provided,\
+        ---it'll be executed when the player first spawns according to the framework
+        ---@param fun function
+        HRLib.bridge.addPlayerSpawnFunction = function(fun)
+            if HRLib.IsFunction(fun) then
+                functions[#functions+1] = fun
+            end
+        end
+
         HRLib.bridge.playerLoaded = function()
             return HRLib.bridge.type == 'esx' and HRLib.bridge.framework.IsPlayerLoaded() or LocalPlayer.state.isLoggedIn
         end
 
         if HRLib.bridge.playerLoaded() then
             HRLib.bridge.isPlayerSpawned = true
+        else
+            Citizen.CreateThreadNow(function()
+                while not HRLib.bridge.playerLoaded() do
+                    Wait(100)
+                end
+
+                functions()
+
+                HRLib.bridge.isPlayerSpawned = true
+            end)
         end
     end
 
