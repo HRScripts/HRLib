@@ -2,7 +2,17 @@ Citizen.CreateThreadNow(function() -- Adding the code in a thread so the awaits 
     local GetResourceState, serverSide <const> = GetResourceState, IsDuplicityVersion()
     local esxStatus, qbStatus = GetResourceState('es_extended'), GetResourceState('qb-core')
 
-    if esxStatus == 'missing' and qbStatus == 'missing' then return end
+    if esxStatus == 'missing' and qbStatus == 'missing' then
+        HRLib.bridge = setmetatable({
+            framework = 'unknown_unusedBridge',
+            type = 'unknown_unusedBridge'
+        }, {
+            __index = function()
+                local invokingResource <const> = GetInvokingResource()
+                warn(('HRLib\'s bridge functions aren\'t available currently due to missing framework!%s%s'):format(invokingResource and ' Invoking resource: ', invokingResource or ''))
+            end
+        })
+    end
 
     if esxStatus == 'starting' or qbStatus == 'starting' or esxStatus == 'stopped' or qbStatus == 'stopped' then
         if esxStatus == 'stopped' or qbStatus == 'stopped' then
