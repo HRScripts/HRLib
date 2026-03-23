@@ -86,7 +86,7 @@ else
     SetNUIStatusDefaultMessage = setmetatable({
         set = function(self, message)
             if type(message) == 'table' and table.type(message) == 'hash' and HRLib.table.find(message, 'status') then
-                rawset(self, 'message', { permissionIndex = permissionIndex, message = message })
+                rawset(self, 'message', message)
             end
         end
     }, {
@@ -106,7 +106,19 @@ else
         if message and type(message) == 'table' then
             SendNUIMessage(message)
         elseif SetNUIStatusDefaultMessage.message and message ~= 'no' then
-            SendNUIMessage(SetNUIStatusDefaultMessage.message)
+            local defaultMessage <const> = HRLib.table.deepclone(SetNUIStatusDefaultMessage.message)
+            local found <const>, _, fullIndexes <const> = HRLib.table.find(defaultMessage, 'status', false, true)
+            if found then
+                if type(fullIndexes) == 'table' then
+                    for i=1, #fullIndexes do
+                        HRLib.table.changeValueOfFullIndex(defaultMessage, fullIndexes[i], status)
+                    end
+                elseif fullIndexes then
+                    HRLib.table.changeValueOfFullIndex(defaultMessage, fullIndexes, status)
+                end
+
+                SendNUIMessage(defaultMessage)
+            end
         end
     end
 end
