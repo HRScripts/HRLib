@@ -44,8 +44,10 @@ if IsDuplicityVersion() then
             return warn(('The player %s with %s id tried to execute very dangerous event!\nIt\'s most probably a modder!'):format(GetPlayerName(source), source))
         end
 
-        Wait(100)
-        StopResource(GetInvokingResource())
+        local invokingRes <const> = GetInvokingResource()
+
+        Wait(0) -- Error preventing wait, do not remove!
+        StopResource(invokingRes)
     end)
 
     RegisterNetEvent('HRLib:RestartMyself', function()
@@ -55,9 +57,9 @@ if IsDuplicityVersion() then
 
         local resourceName <const> = GetInvokingResource()
 
-        Wait(100)
+        Wait(0) -- Error preventing wait, do not remove!
         StopResource(resourceName)
-        Wait(100)
+        Wait(100) -- Error preventing wait, do not remove!
         StartResource(resourceName)
     end)
 
