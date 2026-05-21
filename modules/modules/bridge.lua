@@ -1,5 +1,5 @@
 Citizen.CreateThreadNow(function() -- Adding the code in a thread so the awaits for existing framework core script starting are not interrupting with the starting of HRLib
-    local GetResourceState, serverSide <const> = GetResourceState, IsDuplicityVersion()
+    local GetResourceState, serverSide <const>, resName <const> = GetResourceState, IsDuplicityVersion(), GetCurrentResourceName()
     local esxStatus, qbStatus = GetResourceState('es_extended'), GetResourceState('qb-core')
 
     if esxStatus == 'missing' and qbStatus == 'missing' then
@@ -44,12 +44,16 @@ Citizen.CreateThreadNow(function() -- Adding the code in a thread so the awaits 
             type = 'unknown_unusedBridge'
         }, {
             __index = function()
-                local invokingResource <const> = GetInvokingResource()
+                local invokingResource <const> = GetInvokingResource() or resName
                 warn(('HRLib\'s bridge functions aren\'t available currently due to missing framework!%s%s'):format(invokingResource and ' Invoking resource: ', invokingResource or ''))
             end
         })
 
-        return warn(('^1%s^0'):format(('No framework functions found!?%s%s\nThe script will not provide its bridge functions until there\'s started core resource of the qb or esx legacy frameworks!'):format(GetInvokingResource() and ' Invoking resource: ', GetInvokingResource() or '')))
+        if resName == 'HRLib' or not GetResourceMetadata(resName, 'require_HRLib_bridge', 0) then
+            return warn(('^1%s^0'):format(('No framework functions found!?%s%s\nThe script will not provide its bridge functions until there\'s started core resource of QBCore or ESX Legacy frameworks!'):format(GetInvokingResource() and ' Invoking resource: ' or ' Current resource: ', GetInvokingResource() or GetCurrentResourceName())))
+        end
+
+        return error(('%s can\'t work without framework, such isn\'t found (Supported frameworks: ESX, QBCore).\nFor more information visit https://hrscripts.gitbook.io'):format(resName))
     end
 
     HRLib.bridge = {}
